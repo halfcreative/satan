@@ -1,0 +1,28 @@
+{
+  "name": "satan",
+  "version": "1.0.0",
+  "description": "Semi-Automatic Trading Algorithm Network",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/halfcreative/satan.git"
+  },
+  "author": "Alan Sato",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/halfcreative/satan/issues"
+  },
+  "homepage": "https://github.com/halfcreative/satan#readme",
+  "dependencies": {
+    "aws-lambda": "^1.0.6"
+  },
+  "devDependencies": {
+    "@types/aws-lambda": "^8.10.61",
+    "@types/node": "^14.6.0",
+    "ts-node": "^9.0.0",
+    "typescript": "^4.0.2"
+  }
+}
