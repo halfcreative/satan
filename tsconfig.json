@@ -9,7 +9,7 @@
         "baseUrl": "./app"
     },
     "include": [
-        "lib/**/*.ts"
+        "app/**/*.ts"
     ],
     "exclude": [
         "node_modules"
