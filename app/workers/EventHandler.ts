@@ -10,7 +10,7 @@ export class EventHandler {
     }
 
     public initCodeFlow(event: any, callback: Callback) {
-        console.info(`Event Recieved : ${event}`);
+        console.info(`Event Recieved : ${JSON.stringify(event)}`);
         this.autoFlow(callback);
     }
 
