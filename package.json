@@ -1,7 +1,7 @@
 {
   "name": "satan",
   "version": "1.0.0",
-  "description": "Semi-Automatic Trading Algorithm Network",
+  "description": "Semi-Automatic Trading Assistant Network",
   "main": "index.js",
   "scripts": {
     "build": "rm -r ./dist && tsc",
