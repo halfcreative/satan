@@ -1,8 +1,6 @@
 import {
     AuthenticatedClient,
     ProductTicker,
-    OrderParams,
-    Account
 } from "coinbase-pro";
 
 
