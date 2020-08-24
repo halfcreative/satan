@@ -1,8 +1,8 @@
 {
   "name": "satan",
   "version": "1.0.0",
-  "description": "Semi-Automatic Trading Algorithm Network",
-  "main": "index.js",
+  "description": "Semi-Automatic Trading Assistant Network",
+  "main": "dist/index.js",
   "scripts": {
     "build": "rm -r ./dist && tsc",
     "package": "rm *.zip && zip -r satan.zip ./dist/* ./node_modules"
