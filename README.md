@@ -1,4 +1,4 @@
-# SATAN (Semi-Automatic Trading Algorithm Network)
+# SATAN (Semi-Automatic Trading Assistant Network)
 
 Satan is intended to be a serverless trading algorithm written in typescript.
 
