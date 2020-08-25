@@ -47,6 +47,9 @@ export class FlowHandler {
      * runs the code sequence for user-command events.
      */
     private commandFlow() {
+        if (!this.executor) {
+            this.executor = new Executor();
+        }
 
     }
 

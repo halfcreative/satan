@@ -16,7 +16,7 @@ export class Evaluator {
     }
 
     public retrieveAndEvaluateAssetInfo() {
-        return this.retrieveCurrentAssetInfo().then(assetInfo => this.evaluateAssetInfo(assetInfo));
+        return this.retrieveCurrentAssetInfo().then(assetInfo => this.evaluateAssetInfo(assetInfo)).then(value => this.storeAssetInfo(value));
     }
 
     private retrieveCurrentAssetInfo() {
@@ -26,6 +26,10 @@ export class Evaluator {
     private evaluateAssetInfo(info: any) {
         console.log(info);
         return info;
+    }
+
+    private storeAssetInfo(info) {
+        return this.dbService.storeEvaluation(info, "btc");
     }
 
 }
