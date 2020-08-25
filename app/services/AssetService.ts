@@ -1,4 +1,5 @@
 import { CoinbaseAPIClient } from "../clients/CoinbaseAPIClient";
+import { OrderParams } from "coinbase-pro";
 
 /**
  * Service for getting asset information.
@@ -15,6 +16,10 @@ export class AssetService {
 
     public async getTicker() {
         return this.coinbase.getTicker();
+    }
+
+    public executeOrder(order: OrderParams) {
+        return this.coinbase.executeOrder(order);
     }
 
 }

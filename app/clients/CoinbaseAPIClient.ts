@@ -1,6 +1,7 @@
 import {
     AuthenticatedClient,
     ProductTicker,
+    OrderParams,
 } from "coinbase-pro";
 
 
@@ -26,4 +27,13 @@ export class CoinbaseAPIClient {
         return this.coinbaseProClient.getProductTicker("BTC-USD");
     }
 
+    /**
+    * sends a order request to the Coinbase API
+    *
+    * @param {OrderParams} order an OrderParams object returned from the Evaluator inside the evaluation;
+    * @memberof APIRepository
+    */
+    public executeOrder(order: OrderParams) {
+        return this.coinbaseProClient.placeOrder(order);
+    }
 }
