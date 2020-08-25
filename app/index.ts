@@ -1,16 +1,16 @@
 import { Handler, Context, Callback } from "aws-lambda";
-import { EventHandler } from "./workers/EventHandler";
+import { FlowHandler } from "./workers/FlowHandler";
 
-let eventHandler: EventHandler | null = null;
+let flowHandler: FlowHandler | null = null;
 
 const handler: Handler = (event: any, context: Context, callback: Callback) => {
     context.callbackWaitsForEmptyEventLoop = false;
 
-    if (!eventHandler) {
-        eventHandler = new EventHandler();
+    if (!flowHandler) {
+        flowHandler = new FlowHandler();
     }
 
-    eventHandler.initCodeFlow(event, callback);
+    flowHandler.initCodeFlow(event, callback);
 };
 
 export { handler };
