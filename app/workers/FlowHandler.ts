@@ -22,7 +22,11 @@ export class FlowHandler {
      */
     public initCodeFlow(event: any, callback: Callback) {
         console.info(`Event Recieved : ${JSON.stringify(event)}`);
-        this.autoFlow(callback);
+        if (this.commandEventCheck) {
+            this.commandFlow();
+        } else {
+            this.autoFlow(callback);
+        }
     }
 
 
@@ -36,6 +40,7 @@ export class FlowHandler {
         if (!this.executor) {
             this.executor = new Executor();
         }
+        console.info("Starting Automated Analysis");
         this.evaluator.retrieveAndEvaluateAssetInfo().then(ticker => {
             callback(null, ticker);
         }).catch(error => {
@@ -50,7 +55,15 @@ export class FlowHandler {
         if (!this.executor) {
             this.executor = new Executor();
         }
+        console.log("Initiating External Command");
 
+    }
+
+    private commandEventCheck(event: any) {
+        if (event.source && event.source == "aws.events") {
+            return false;
+        }
+        return true;
     }
 
 }
