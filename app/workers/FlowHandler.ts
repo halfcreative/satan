@@ -3,7 +3,7 @@ import { AssetService } from "../services/AssetService";
 import { Evaluator } from "./Evaluator";
 import { Executor } from "./Executor";
 
-export class EventHandler {
+export class FlowHandler {
 
     private evaluator: Evaluator;
     private executor: Executor;
@@ -11,6 +11,15 @@ export class EventHandler {
     constructor() {
     }
 
+
+    /**
+     * Determines the code flow to initiate based on the event.
+     * Command calls to the API will result in the "Command" flow
+     * Chron calls from cloudwatch will result in the "Automated" flow
+     * 
+     * @param event The event that initiated this lambda call
+     * @param callback Callback function to end the lambda.
+     */
     public initCodeFlow(event: any, callback: Callback) {
         console.info(`Event Recieved : ${JSON.stringify(event)}`);
         this.autoFlow(callback);
