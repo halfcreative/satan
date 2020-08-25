@@ -1,12 +1,14 @@
 import { Callback } from "aws-lambda";
 import { AssetService } from "../services/AssetService";
+import { Evaluator } from "./Evaluator";
+import { Executor } from "./Executor";
 
 export class EventHandler {
 
-    private assetService: AssetService;
+    private evaluator: Evaluator;
+    private executor: Executor;
 
     constructor() {
-        this.assetService = new AssetService();
     }
 
     public initCodeFlow(event: any, callback: Callback) {
@@ -19,7 +21,13 @@ export class EventHandler {
      * runs the code sequence for automated analysis.
      */
     private autoFlow(callback: Callback) {
-        this.assetService.getTicker().then(ticker => {
+        if (!this.evaluator) {
+            this.evaluator = new Evaluator();
+        }
+        if (!this.executor) {
+            this.executor = new Executor();
+        }
+        this.evaluator.retrieveAndEvaluateAssetInfo().then(ticker => {
             callback(null, ticker);
         }).catch(error => {
             callback(error);
