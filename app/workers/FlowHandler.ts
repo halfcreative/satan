@@ -2,6 +2,7 @@ import { Callback } from "aws-lambda";
 import { AssetService } from "../services/AssetService";
 import { Evaluator } from "./Evaluator";
 import { Executor } from "./Executor";
+import * as CONSTANTS from '../constants/constants';
 
 export class FlowHandler {
 
@@ -10,7 +11,6 @@ export class FlowHandler {
 
     constructor() {
     }
-
 
     /**
      * Determines the code flow to initiate based on the event.
@@ -22,13 +22,12 @@ export class FlowHandler {
      */
     public initCodeFlow(event: any, callback: Callback) {
         console.info(`Event Recieved : ${JSON.stringify(event)}`);
-        if (this.commandEventCheck) {
+        if (this.commandEventCheck(event)) {
             this.commandFlow();
         } else {
             this.autoFlow(callback);
         }
     }
-
 
     /**
      * runs the code sequence for automated analysis.
@@ -41,7 +40,8 @@ export class FlowHandler {
             this.executor = new Executor();
         }
         console.info("Starting Automated Analysis");
-        this.evaluator.retrieveAndEvaluateAssetInfo().then(ticker => {
+
+        this.evaluator.retrieveAndEvaluateAssetInfo(CONSTANTS.BTCUSD).then(ticker => {
             callback(null, ticker);
         }).catch(error => {
             callback(error);

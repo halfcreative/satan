@@ -1,0 +1,1 @@
+export const BTCUSD: string = "BTC-USD";
