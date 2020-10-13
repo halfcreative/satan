@@ -10,14 +10,14 @@ export class DBService {
         this.dbClient = new MongoDBClient();
     }
 
-    public storeEvaluation(evaluation: any, collection: string): Promise<any> {
+    public storeEvaluation(evaluation: any, collection: string): Promise<Evaluation> {
         return this.dbClient.connectToDatabase().then((db: Db) => {
-            return this.dbClient.storeEvaluation(db, collection, evaluation);
+            return this.dbClient.storeEvaluation(db, collection, evaluation).then(storedEval => { return storedEval });
         })
 
     }
 
-    public getMostRecentEvaluation(collection: string): Promise<Array<Evaluation>> {
+    public getMostRecentEvaluation(collection: string): Promise<Evaluation> {
         return this.dbClient.connectToDatabase().then((db: Db) => {
             return this.dbClient.getLastEvaluation(db, collection);
         })

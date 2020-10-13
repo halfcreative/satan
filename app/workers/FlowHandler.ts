@@ -42,7 +42,6 @@ export class FlowHandler {
         console.info("Starting Automated Analysis");
 
         this.evaluator.retrieveAndEvaluateAssetInfo(CONSTANTS.BTCUSD).then(ticker => {
-            console.log(ticker);
             callback(null, ticker);
         }).catch(error => {
             callback(error);

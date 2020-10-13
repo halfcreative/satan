@@ -38,7 +38,7 @@ export class MongoDBClient {
         db: Db,
         collection: string,
         data: any
-    ): Promise<any> {
+    ): Promise<Evaluation> {
         return db
             .collection(collection)
             .insertOne(data)
@@ -66,13 +66,13 @@ export class MongoDBClient {
      * @returns {Promise<Array<any>>}
      * @memberof DBRepository
      */
-    public getLastEvaluation(db: Db, collection: string): Promise<any> {
+    public getLastEvaluation(db: Db, collection: string): Promise<Evaluation> {
         return db
             .collection(collection)
             .find({})
             .limit(1)
             .sort({ $natural: -1 })
-            .toArray();
+            .toArray()[0];
     }
 
 }

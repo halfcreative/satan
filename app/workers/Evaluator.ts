@@ -19,7 +19,9 @@ export class Evaluator {
     }
 
     public retrieveAndEvaluateAssetInfo(currency: string) {
-        return this.retrieveCurrentAssetInfo(currency).then(assetInfo => this.evaluateAssetInfo(assetInfo)).then(evaluation => this.storeEvaluation(evaluation, currency));
+        return this.retrieveCurrentAssetInfo(currency).then(
+            assetInfo => this.evaluateAssetInfo(assetInfo)).then(
+                evaluation => this.storeEvaluation(evaluation, currency));
     }
 
     /**
@@ -31,7 +33,7 @@ export class Evaluator {
         // TODO : ALSO GRAB LAST EVALUATION AND EVALUATIONS OF YESTERDAY, 3DAYS AGO, 5DAYS AGO, 10DAYS AGO, and 1MONTH AGO
         return Promise.all([this.assetService.getTicker(currency), this.assetService.getHistory(currency, 100), this.dbService.getMostRecentEvaluation(currency)]).then(values => {
             console.log("values retrieved ", values[2]);
-            return new AssetInformationModel(values[0], values[1], values[2][0]);
+            return new AssetInformationModel(values[0], values[1], values[2]);
         });
     }
 
