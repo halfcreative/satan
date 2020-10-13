@@ -32,17 +32,19 @@ export class Indicators {
 export class MACD {
     public macd: number;
     public macdSignal: number;
-    public prevMACDOBJ: number;
-    public prevMACDOBJSignal: number;
+    public prevMACD: number;
+    public prevMACDSignal: number;
     public macdGTSignal: boolean;
     public convergingMacdSignal: boolean;
     public macdCrossoverSignal: boolean;
 
     constructor(macd: number, signal: number, prevMACDOBJ?: MACD) {
+        this.macd = macd;
+        this.macdSignal = signal;
         this.macdGTSignal = macd > signal;
         if (prevMACDOBJ) {
-            this.prevMACDOBJ = prevMACDOBJ.macd;
-            this.prevMACDOBJSignal = prevMACDOBJ.macdSignal;
+            this.prevMACD = prevMACDOBJ.macd;
+            this.prevMACDSignal = prevMACDOBJ.macdSignal;
             if (
                 Math.abs(macd - signal) <
                 Math.abs(prevMACDOBJ.macd - prevMACDOBJ.macdSignal)

@@ -1,8 +1,8 @@
 import { AssetService } from "../services/AssetService";
 import { DBService } from "../services/DatabaseService";
 import * as TA from "../utilities/TAUtils";
-import { AssetInformationModel } from "models/AssetInfoModel";
-import { Evaluation, Indicators, MACD } from "models/EvaluationModel";
+import { AssetInformationModel } from "../models/AssetInfoModel";
+import { Evaluation, Indicators, MACD } from "../models/EvaluationModel";
 
 export class Evaluator {
 
@@ -19,7 +19,7 @@ export class Evaluator {
     }
 
     public retrieveAndEvaluateAssetInfo(currency: string) {
-        return this.retrieveCurrentAssetInfo(currency).then(assetInfo => this.evaluateAssetInfo(assetInfo)).then(evaluation => this.storeEvaluation(evaluation));
+        return this.retrieveCurrentAssetInfo(currency).then(assetInfo => this.evaluateAssetInfo(assetInfo)).then(evaluation => this.storeEvaluation(evaluation, currency));
     }
 
     /**
@@ -29,12 +29,14 @@ export class Evaluator {
      */
     private retrieveCurrentAssetInfo(currency: string): Promise<AssetInformationModel> {
         // TODO : ALSO GRAB LAST EVALUATION AND EVALUATIONS OF YESTERDAY, 3DAYS AGO, 5DAYS AGO, 10DAYS AGO, and 1MONTH AGO
-        return Promise.all([this.assetService.getTicker(currency), this.assetService.getHistory(currency, 100)]).then(values => {
-            return new AssetInformationModel(values[0], values[1]);
+        return Promise.all([this.assetService.getTicker(currency), this.assetService.getHistory(currency, 100), this.dbService.getMostRecentEvaluation(currency)]).then(values => {
+            console.log("values retrieved ", values[2]);
+            return new AssetInformationModel(values[0], values[1], values[2][0]);
         });
     }
 
     private evaluateAssetInfo(info: AssetInformationModel): Evaluation {
+        console.log("Asset Info Model", info.lastEval);
         const evaluation = new Evaluation();
         evaluation.price = parseFloat(info.ticker.price);
         const closingHistory = this.assetService.singleSetHistory(info.history, 4) // get only the history of closing values
@@ -49,13 +51,15 @@ export class Evaluator {
 
         const macd = TA.macd(closingHistory, 20);
         const macdSignal = TA.macdSignal(macd);
-        evaluation.indicators.macd = new MACD(macd[0], macdSignal[0]);
+
+
+        evaluation.indicators.macd = info.lastEval ? new MACD(macd[0], macdSignal[0], info.lastEval.indicators.macd) : new MACD(macd[0], macdSignal[0]);
 
         return evaluation;
     }
 
-    private storeEvaluation(info) {
-        return this.dbService.storeEvaluation(info, "btc");
+    private storeEvaluation(info, currency) {
+        return this.dbService.storeEvaluation(info, currency);
     }
 
 }

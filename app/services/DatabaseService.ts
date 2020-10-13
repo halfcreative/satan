@@ -1,5 +1,6 @@
 import { MongoDBClient } from '../clients/MongoDBClient';
 import { Db } from 'mongodb';
+import { Evaluation } from 'models/EvaluationModel';
 
 export class DBService {
 
@@ -16,7 +17,7 @@ export class DBService {
 
     }
 
-    public getMostRecentEvaluations(collection: string): Promise<any[]> {
+    public getMostRecentEvaluation(collection: string): Promise<Array<Evaluation>> {
         return this.dbClient.connectToDatabase().then((db: Db) => {
             return this.dbClient.getLastEvaluation(db, collection);
         })
