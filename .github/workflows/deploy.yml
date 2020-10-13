@@ -1,0 +1,51 @@
+name: production
+
+on:
+    push:
+        branches:
+            - master
+        paths:
+            - "lib/**"
+
+jobs:
+    test:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Checkout Master
+              uses: actions/checkout@v2
+              with:
+                  ref: master
+            - name: Setup NodeJS 12.X
+              uses: actions/setup-node@v1
+              with:
+                  node-version: "12.x"
+            - name: Install Dependencies
+              run: npm install
+            - name: Run Tests
+              run: npm test
+    deploy:
+        runs-on: ubuntu-latest
+        needs: test
+        steps:
+            - name: Checkout Master
+              uses: actions/checkout@v2
+              with:
+                  ref: master
+            - name: Setup NodeJS 12.X
+              uses: actions/setup-node@v1
+              with:
+                  node-version: "12.x"
+            - name: Install Dependencies
+              run: npm ci
+            - name: Compile
+              run: tsc
+            - name: Create Zip
+              run: zip -r deployment.zip .
+            - name: AWS Lambda Deploy
+              uses: appleboy/lambda-action@v0.0.4
+              with:
+                  aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws_region: ${{ secrets.AWS_REGION }}
+                  function_name: SATAN
+                  zip_file: deployment.zip
