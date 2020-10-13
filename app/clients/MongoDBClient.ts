@@ -1,3 +1,4 @@
+import { Evaluation } from "models/EvaluationModel";
 import { Db, MongoClient } from "mongodb";
 
 const MONGODB_URI: string = process.env.MONGODB_URI;
@@ -37,7 +38,7 @@ export class MongoDBClient {
         db: Db,
         collection: string,
         data: any
-    ): Promise<any> {
+    ): Promise<Evaluation> {
         return db
             .collection(collection)
             .insertOne(data)
@@ -65,20 +66,13 @@ export class MongoDBClient {
      * @returns {Promise<Array<any>>}
      * @memberof DBRepository
      */
-    public getLastEvaluation(db: Db, collection: string): Promise<Array<any>> {
+    public getLastEvaluation(db: Db, collection: string): Promise<Evaluation> {
         return db
             .collection(collection)
             .find({})
             .limit(1)
             .sort({ $natural: -1 })
-            .toArray();
+            .toArray()[0];
     }
 
-    public getLastEvaluations(db: Db, collections: Array<string>): Promise<Array<Array<any>>> {
-        let promises: Array<Promise<any>> = [];
-        for (let collection of collections) {
-            promises.push(this.getLastEvaluation(db, collection));
-        }
-        return Promise.all(promises);
-    }
 }

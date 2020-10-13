@@ -1,4 +1,5 @@
 import { CoinbaseAPIClient } from "../clients/CoinbaseAPIClient";
+import { OrderParams } from "coinbase-pro";
 
 /**
  * Service for getting asset information.
@@ -13,8 +14,39 @@ export class AssetService {
         this.coinbase = new CoinbaseAPIClient();
     }
 
-    public async getTicker() {
-        return this.coinbase.getTicker();
+    public async getTicker(currency: string) {
+        return this.coinbase.getTicker(currency);
+    }
+
+    public async getHistory(currency: string, range) {
+        return this.coinbase.getHistoricRatesByDay(range, currency);
+    }
+
+    /**
+         * Slims down historic data provided by coinbase into a single set of prices.
+         * The base indicates which value to get.
+         * 1 - High, (trim down the history to just history of Highs)
+         * 2 - Low, (trim down the history to just history of Lows)
+         * 3 - Open, (trim down the history to just history of Open)
+         * 4 - Close, (trim down the history to just history of Close)
+         *
+         * @param {Array<Array<number>>} history
+         * @param {number} base
+         * @returns {Array<number>} history -slimmed
+         */
+    public singleSetHistory(
+        history: Array<Array<number>>,
+        base: number
+    ): Array<number> {
+        let slimmedArray: Array<number> = [];
+        for (let i = 0; i < history.length; i++) {
+            slimmedArray.push(history[i][base]);
+        }
+        return slimmedArray;
+    }
+
+    public executeOrder(order: OrderParams) {
+        return this.coinbase.executeOrder(order);
     }
 
 }

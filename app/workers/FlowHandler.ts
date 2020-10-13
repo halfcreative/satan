@@ -2,6 +2,7 @@ import { Callback } from "aws-lambda";
 import { AssetService } from "../services/AssetService";
 import { Evaluator } from "./Evaluator";
 import { Executor } from "./Executor";
+import * as CONSTANTS from '../constants/constants';
 
 export class FlowHandler {
 
@@ -10,7 +11,6 @@ export class FlowHandler {
 
     constructor() {
     }
-
 
     /**
      * Determines the code flow to initiate based on the event.
@@ -22,9 +22,12 @@ export class FlowHandler {
      */
     public initCodeFlow(event: any, callback: Callback) {
         console.info(`Event Recieved : ${JSON.stringify(event)}`);
-        this.autoFlow(callback);
+        if (this.commandEventCheck(event)) {
+            this.commandFlow();
+        } else {
+            this.autoFlow(callback);
+        }
     }
-
 
     /**
      * runs the code sequence for automated analysis.
@@ -36,7 +39,9 @@ export class FlowHandler {
         if (!this.executor) {
             this.executor = new Executor();
         }
-        this.evaluator.retrieveAndEvaluateAssetInfo().then(ticker => {
+        console.info("Starting Automated Analysis");
+
+        this.evaluator.retrieveAndEvaluateAssetInfo(CONSTANTS.BTCUSD).then(ticker => {
             callback(null, ticker);
         }).catch(error => {
             callback(error);
@@ -50,7 +55,15 @@ export class FlowHandler {
         if (!this.executor) {
             this.executor = new Executor();
         }
+        console.log("Initiating External Command");
 
+    }
+
+    private commandEventCheck(event: any) {
+        if (event.source && event.source == "aws.events") {
+            return false;
+        }
+        return true;
     }
 
 }
