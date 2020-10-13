@@ -18,7 +18,7 @@ export class Evaluator {
         }
     }
 
-    public retrieveAndEvaluateAssetInfo(currency: string) {
+    public retrieveAndEvaluateAssetInfo(currency: string): Promise<Evaluation> {
         return this.retrieveCurrentAssetInfo(currency).then(
             assetInfo => this.evaluateAssetInfo(assetInfo)).then(
                 evaluation => this.storeEvaluation(evaluation, currency));
@@ -60,7 +60,7 @@ export class Evaluator {
         return evaluation;
     }
 
-    private storeEvaluation(info, currency) {
+    private storeEvaluation(info, currency): Promise<Evaluation> {
         return this.dbService.storeEvaluation(info, currency);
     }
 
