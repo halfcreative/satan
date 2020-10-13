@@ -19,7 +19,7 @@ export class Evaluator {
     }
 
     public retrieveAndEvaluateAssetInfo(currency: string) {
-        return this.retrieveCurrentAssetInfo(currency).then(assetInfo => this.evaluateAssetInfo(assetInfo)).then(value => this.storeEvaluation(value));
+        return this.retrieveCurrentAssetInfo(currency).then(assetInfo => this.evaluateAssetInfo(assetInfo)).then(evaluation => this.storeEvaluation(evaluation));
     }
 
     /**
