@@ -18,26 +18,12 @@ export class Evaluator {
         }
     }
 
-    public retrieveAndEvaluateAssetInfo(currency: string): Promise<Evaluation> {
-        return this.retrieveCurrentAssetInfo(currency).then(
-            assetInfo => this.evaluateAssetInfo(assetInfo)).then(
-                evaluation => this.storeEvaluation(evaluation, currency));
+    public evaluateAssetAndStoreEvaluation(currency: string, assetInfo: AssetInformationModel): Promise<Evaluation> {
+        const evaluation = this.generateFullEvaluation(assetInfo)
+        return this.storeEvaluation(currency, evaluation);
     }
 
-    /**
-     * 
-     * @param currency The currency to retrieve info for
-     * @returns {AssetInformationModel} 
-     */
-    private retrieveCurrentAssetInfo(currency: string): Promise<AssetInformationModel> {
-        // TODO : ALSO GRAB LAST EVALUATION AND EVALUATIONS OF YESTERDAY, 3DAYS AGO, 5DAYS AGO, 10DAYS AGO, and 1MONTH AGO
-        return Promise.all([this.assetService.getTicker(currency), this.assetService.getHistory(currency, 100), this.dbService.getMostRecentEvaluation(currency)]).then(values => {
-            console.log("values retrieved ", values[2]);
-            return new AssetInformationModel(values[0], values[1], values[2]);
-        });
-    }
-
-    private evaluateAssetInfo(info: AssetInformationModel): Evaluation {
+    private generateFullEvaluation(info: AssetInformationModel): Evaluation {
         console.log("Asset Info Model", info.lastEval);
         const evaluation = new Evaluation();
         evaluation.price = parseFloat(info.ticker.price);
@@ -60,8 +46,8 @@ export class Evaluator {
         return evaluation;
     }
 
-    private storeEvaluation(info, currency): Promise<Evaluation> {
-        return this.dbService.storeEvaluation(info, currency);
+    private storeEvaluation(currency: string, evaluation: Evaluation): Promise<Evaluation> {
+        return this.dbService.storeEvaluation(currency, evaluation);
     }
 
 }

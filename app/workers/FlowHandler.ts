@@ -3,9 +3,12 @@ import { AssetService } from "../services/AssetService";
 import { Evaluator } from "./Evaluator";
 import { Executor } from "./Executor";
 import * as CONSTANTS from '../constants/constants';
+import { Aggregator } from "./InfoAggregator";
 
 export class FlowHandler {
 
+
+    private aggregator: Aggregator;
     private evaluator: Evaluator;
     private executor: Executor;
 
@@ -32,20 +35,27 @@ export class FlowHandler {
     /**
      * runs the code sequence for automated analysis.
      */
-    private autoFlow(callback: Callback) {
+    private autoFlow(callback: Callback): void {
+        // Initiate the worker classes if not already present
+        if (!this.aggregator) {
+            this.aggregator = new Aggregator();
+        }
         if (!this.evaluator) {
             this.evaluator = new Evaluator();
         }
         if (!this.executor) {
             this.executor = new Executor();
         }
-        console.info("Starting Automated Analysis");
-
-        this.evaluator.retrieveAndEvaluateAssetInfo(CONSTANTS.BTCUSD).then(ticker => {
-            callback(null, ticker);
+        // Automatic flow is as follows : gather asset info -> evaluate asset -> execute evaluation
+        this.aggregator.gatherAssetInfo(CONSTANTS.BTCUSD).then(assetInfo => {
+            return this.evaluator.evaluateAssetAndStoreEvaluation(CONSTANTS.BTCUSD, assetInfo);
+        }).then(evaluation => {
+            return this.executor.executeOrder(evaluation);
+        }).then(executionResult => {
+            callback(null, executionResult);
         }).catch(error => {
             callback(error);
-        });
+        })
     }
 
     /**

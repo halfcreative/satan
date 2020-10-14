@@ -1,6 +1,6 @@
 import { MongoDBClient } from '../clients/MongoDBClient';
 import { Db } from 'mongodb';
-import { Evaluation } from 'models/EvaluationModel';
+import { Evaluation } from '../models/EvaluationModel';
 
 export class DBService {
 
@@ -10,7 +10,7 @@ export class DBService {
         this.dbClient = new MongoDBClient();
     }
 
-    public storeEvaluation(evaluation: any, collection: string): Promise<Evaluation> {
+    public storeEvaluation(collection: string, evaluation: Evaluation): Promise<Evaluation> {
         return this.dbClient.connectToDatabase().then((db: Db) => {
             return this.dbClient.storeEvaluation(db, collection, evaluation).then(storedEval => { return storedEval });
         })
