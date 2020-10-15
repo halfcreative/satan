@@ -3,6 +3,7 @@ import { DBService } from "../services/DatabaseService";
 import * as TA from "../utilities/TAUtils";
 import { AssetInformationModel } from "../models/AssetInfoModel";
 import { Evaluation, Indicators, MACD } from "../models/EvaluationModel";
+import { OrderParams } from "coinbase-pro";
 
 export class Evaluator {
 
@@ -24,6 +25,7 @@ export class Evaluator {
         const evaluation = new Evaluation();
         evaluation.price = parseFloat(info.ticker.price);
         evaluation.indicators = this.calculateIndicators(info);
+        evaluation.orders = this.determineActions();
         return evaluation;
     }
 
@@ -43,6 +45,11 @@ export class Evaluator {
         indicators.macd = assetInfo.lastEval ? new MACD(macd[0], macdSignal[0], assetInfo.lastEval.indicators.macd) : new MACD(macd[0], macdSignal[0]);
 
         return indicators;
+    }
+
+    private determineActions(): Array<OrderParams> {
+        const orders: Array<OrderParams> = [];
+        return orders;
     }
 
     private storeEvaluation(currency: string, evaluation: Evaluation): Promise<Evaluation> {
