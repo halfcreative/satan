@@ -9,13 +9,9 @@ export class Evaluator {
     private assetService: AssetService;
     private dbService: DBService;
 
-    constructor() {
-        if (!this.assetService) {
-            this.assetService = new AssetService();
-        }
-        if (!this.dbService) {
-            this.dbService = new DBService();
-        }
+    constructor(assetService: AssetService, dbService: DBService) {
+        this.assetService = assetService;
+        this.dbService = dbService;
     }
 
     public evaluateAssetAndStoreEvaluation(currency: string, assetInfo: AssetInformationModel): Promise<Evaluation> {

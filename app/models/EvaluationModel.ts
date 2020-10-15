@@ -6,11 +6,14 @@ export class Evaluation {
     public price: number;
     public indicators: Indicators;
     public hindsight: Hindsight;
+    public placeOrder: boolean;
+    public orders: Array<OrderParams>;
 
     constructor() {
         this.date = new Date();
     }
 }
+
 
 export class Hindsight {
     public oneDay: number;
