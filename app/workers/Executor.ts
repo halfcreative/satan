@@ -1,3 +1,4 @@
+import { OrderResult } from "coinbase-pro";
 import { Evaluation } from "../models/EvaluationModel";
 import { AssetService } from "../services/AssetService";
 import { DBService } from "../services/DatabaseService";
@@ -13,12 +14,13 @@ export class Executor {
     }
 
     public executeOrderFromEvaluation(evaluation: Evaluation) {
-
-        if (evaluation.placeOrder) {
-
+        if (evaluation.orders) {
+            console.info("Order Request Confirmed");
+            const orders = evaluation.orders.length;
+            console.log(orders + " orders to place");
+            return this.assetService.executeMultipleOrders(evaluation.orders);
         } else {
-
+            return null;
         }
-        return null;
     }
 }

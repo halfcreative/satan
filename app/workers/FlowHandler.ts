@@ -57,8 +57,8 @@ export class FlowHandler {
             return this.evaluator.evaluateAssetAndStoreEvaluation(CONSTANTS.BTCUSD, assetInfo);
         }).then(evaluation => {
             return this.executor.executeOrderFromEvaluation(evaluation);
-        }).then(executionResult => {
-            callback(null, executionResult);
+        }).then(orderResults => {
+            callback(null, orderResults);
         }).catch(error => {
             callback(error);
         })
