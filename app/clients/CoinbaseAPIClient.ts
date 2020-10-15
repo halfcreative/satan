@@ -1,7 +1,7 @@
 import {
     AuthenticatedClient,
     ProductTicker,
-    OrderParams,
+    OrderParams, Account
 } from "coinbase-pro";
 
 
@@ -64,6 +64,11 @@ export class CoinbaseAPIClient {
     */
     public executeOrder(order: OrderParams) {
         return this.coinbaseProClient.placeOrder(order);
+    }
+
+
+    public getAccounts(): Promise<Array<Account>> {
+        return this.coinbaseProClient.getAccounts();
     }
 
 }

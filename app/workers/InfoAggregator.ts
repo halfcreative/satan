@@ -16,8 +16,13 @@ export class Aggregator {
      * @param asset The asset to be gathering information for
      */
     public gatherAssetInfo(asset: string): Promise<AssetInformationModel> {
-        return Promise.all([this.assetService.getTicker(asset), this.assetService.getHistory(asset, 100), this.dbService.getMostRecentEvaluation(asset)]).then(values => {
-            return new AssetInformationModel(values[0], values[1], values[2]);
+        return Promise.all([
+            this.assetService.getTicker(asset),
+            this.assetService.getHistory(asset, 100),
+            this.dbService.getMostRecentEvaluation(asset),
+            this.assetService.getAccounts()
+        ]).then(values => {
+            return new AssetInformationModel(values[0], values[1], values[2], values[3]);
         });
     }
 
