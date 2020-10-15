@@ -1,5 +1,5 @@
 import { CoinbaseAPIClient } from "../clients/CoinbaseAPIClient";
-import { OrderParams } from "coinbase-pro";
+import { Account, OrderParams, OrderResult } from "coinbase-pro";
 
 /**
  * Service for getting asset information.
@@ -45,8 +45,21 @@ export class AssetService {
         return slimmedArray;
     }
 
-    public executeOrder(order: OrderParams) {
+    public executeOrder(order: OrderParams): Promise<OrderResult> {
         return this.coinbase.executeOrder(order);
     }
+
+    public executeMultipleOrders(orders: Array<OrderParams>): Promise<Array<OrderResult>> {
+        const promises: Array<Promise<OrderResult>> = [];
+        for (const order of orders) {
+            promises.push(this.executeOrder(order));
+        }
+        return Promise.all(promises);
+    }
+
+    public getAccounts(): Promise<Array<Account>> {
+        return this.coinbase.getAccounts();
+    }
+
 
 }
