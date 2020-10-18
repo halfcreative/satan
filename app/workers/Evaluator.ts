@@ -27,7 +27,7 @@ export class Evaluator {
         evaluation.price = parseFloat(context.ticker.price);
         evaluation.indicators = this.calculateIndicators(context);
         evaluation.orders = this.determineActions();
-        evaluation.portfolioState = this.evalutateAccountState(currency, context);
+        evaluation.portfolioState = this.evalutatePortfolioState(currency, context);
         return evaluation;
     }
 
@@ -58,12 +58,11 @@ export class Evaluator {
         return this.dbService.storeEvaluation(currency, evaluation);
     }
 
-    private evalutateAccountState(currency: string, context: ContextModel) {
+    private evalutatePortfolioState(currency: string, context: ContextModel) {
         console.info("-- Evaluating Account Info --");
         console.info("Accounts : ", context.accounts);
         let portfolioValue: number = 0;
         for (const account of context.accounts) {
-            let balance: number = parseFloat(account.balance);
             if (account.currency == CONSTANTS.USD) {
                 console.info("Account (USD) :");
                 portfolioValue += parseFloat(parseFloat(account.balance).toFixed(8));
