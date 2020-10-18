@@ -1,6 +1,6 @@
 import { AssetService } from "../services/AssetService";
 import { DBService } from "../services/DatabaseService";
-import { AssetInformationModel } from "../models/AssetInfoModel";
+import { ContextModel } from "../models/ContextModel";
 
 export class Aggregator {
     private assetService: AssetService;
@@ -15,14 +15,14 @@ export class Aggregator {
      * returns an AssetInformationModel containing the 3 values.
      * @param asset The asset to be gathering information for
      */
-    public gatherAssetInfo(asset: string): Promise<AssetInformationModel> {
+    public gatherAssetInfo(asset: string): Promise<ContextModel> {
         return Promise.all([
             this.assetService.getTicker(asset),
             this.assetService.getHistory(asset, 100),
             this.dbService.getMostRecentEvaluation(asset),
             this.assetService.getAccounts()
         ]).then(values => {
-            return new AssetInformationModel(values[0], values[1], values[2], values[3]);
+            return new ContextModel(values[0], values[1], values[2], values[3]);
         });
     }
 
