@@ -52,9 +52,9 @@ export class FlowHandler {
         if (!this.executor) {
             this.executor = new Executor(this.assetService, this.dbService);
         }
-        // Automatic flow is as follows : gather asset info -> evaluate asset -> execute evaluation
-        this.aggregator.gatherAssetInfo(CONSTANTS.BTCUSD).then(assetInfo => {
-            return this.evaluator.evaluateAssetAndStoreEvaluation(CONSTANTS.BTCUSD, assetInfo);
+        // Automatic flow is as follows : gather context -> evaluate asset -> execute evaluation
+        this.aggregator.gatherAssetInfo(CONSTANTS.BTCUSD).then(context => {
+            return this.evaluator.evaluateAssetAndStoreEvaluation(CONSTANTS.BTCUSD, context);
         }).then(evaluation => {
             return this.executor.executeOrderFromEvaluation(evaluation);
         }).then(orderResults => {
