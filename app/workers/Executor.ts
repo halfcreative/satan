@@ -14,10 +14,9 @@ export class Executor {
     }
 
     public executeOrderFromEvaluation(evaluation: Evaluation) {
-        if (evaluation.orders) {
+        if (evaluation.orders.length > 0) {
             console.info("Order Request Confirmed");
-            const orders = evaluation.orders.length;
-            console.log(orders + " orders to place");
+            console.log(`${evaluation.orders.length} orders to place`);
             return this.assetService.executeMultipleOrders(evaluation.orders);
         } else {
             return null;

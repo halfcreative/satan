@@ -1,7 +1,7 @@
 import { Account, ProductTicker } from "coinbase-pro";
 import { Evaluation } from "./EvaluationModel";
 
-export class AssetInformationModel {
+export class ContextModel {
     public ticker: ProductTicker;
     public history: Array<Array<number>>;
     public lastEval: Evaluation;

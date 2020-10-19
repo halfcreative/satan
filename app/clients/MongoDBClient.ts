@@ -25,9 +25,10 @@ export class MongoDBClient {
                     return this.cachedDb;
                 })
                 .catch(e => {
-                    console.error(
-                        "Error: connectToDatabase - MongoClient.connect(uri,params) encountered an exception"
-                    );
+                    console.error(`Error: connectToDatabase - MongoClient.connect(${MONGODB_URI},${{
+                        useNewUrlParser: true,
+                        useUnifiedTopology: true
+                    }}) encountered an exception`);
                     console.error(e);
                     return null;
                 });
@@ -47,13 +48,7 @@ export class MongoDBClient {
                 return data;
             })
             .catch(e => {
-                console.error(
-                    "Error: storeEvaluation - collection(" +
-                    collection +
-                    ").insertOne(" +
-                    data +
-                    ") encountered an exception"
-                );
+                console.error(`Error: storeEvaluation - collection(${collection}).insertOne(${data}) encountered an exception`);
                 console.error(e);
                 return null;
             });
