@@ -207,6 +207,16 @@ export class Evaluator {
     }
 
     private evaluateMACD(indicators: Indicators) {
+        // If Macd Crossed over the Signal line
+        if (indicators.macd.macdCrossoverSignal) {
+            if (indicators.macd.macdGTSignal) {
+                // And macd is greater than signal
+                return CONSTANTS.BUY;
+            } else {
+                // And macd is less than signal
+                return CONSTANTS.SELL;
+            }
+        }
         return CONSTANTS.NA;
 
     }
