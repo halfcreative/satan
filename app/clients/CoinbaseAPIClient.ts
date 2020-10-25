@@ -1,6 +1,7 @@
 import {
     AuthenticatedClient,
     ProductTicker,
+    OrderParams, Account
 } from "coinbase-pro";
 
 
@@ -22,8 +23,52 @@ export class CoinbaseAPIClient {
         );
     }
 
-    public getTicker(): Promise<ProductTicker> {
-        return this.coinbaseProClient.getProductTicker("BTC-USD");
+    public getTicker(currency: string): Promise<ProductTicker> {
+        return this.coinbaseProClient.getProductTicker(currency);
+    }
+
+    public getHistory() {
+        return this.coinbaseProClient.getProductHistoricRates
+    }
+    /**
+    * gets the historical rate of a specified currency across a specified time period.
+    *
+    * @param {number} range days to go back
+    * @param {string} currency the currency to get rates for. (BTC-USD,ETH-USD,etc.)
+    * @param {number} base iThe base indicates which value to get.
+    * 1 - High,
+    * 2 - Low,
+    * 3 - Open,
+    * 4 - Close,
+    * @returns PROMISE Array of prices from most recent to least recent.
+    */
+    public getHistoricRatesByDay(
+        range: number,
+        currency: string,
+    ): Promise<Array<Array<number>>> {
+        let currentDate = new Date();
+        let periodDate = new Date(
+            new Date().setDate(currentDate.getDate() - range)
+        );
+        return this.coinbaseProClient
+            .getProductHistoricRates(currency, {
+                start: periodDate.toISOString(),
+                end: currentDate.toISOString(),
+                granularity: 86400
+            })
+    }
+    /**
+    * sends a order request to the Coinbase API
+    *
+    * @param {OrderParams} order an OrderParams object returned from the Evaluator inside the evaluation;
+    */
+    public executeOrder(order: OrderParams) {
+        return this.coinbaseProClient.placeOrder(order);
+    }
+
+
+    public getAccounts(): Promise<Array<Account>> {
+        return this.coinbaseProClient.getAccounts();
     }
 
 }
