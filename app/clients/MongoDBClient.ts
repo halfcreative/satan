@@ -65,7 +65,7 @@ export class MongoDBClient {
         return db
             .collection(collection)
             .find({})
-            .limit(1)
+            // .limit(1)
             .sort({ $natural: -1 })
             .toArray()[0];
     }
