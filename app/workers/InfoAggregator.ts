@@ -22,7 +22,6 @@ export class Aggregator {
             this.dbService.getMostRecentEvaluation(asset),
             this.assetService.getAccounts()
         ]).then(values => {
-            console.log("most recent eval", values[2]);
             return new ContextModel(values[0], values[1], values[2], values[3]);
         });
     }

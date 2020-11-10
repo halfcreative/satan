@@ -19,6 +19,7 @@ export class DBService {
 
     public getMostRecentEvaluation(collection: string): Promise<Evaluation> {
         return this.dbClient.connectToDatabase().then((db: Db) => {
+            console.log("getting last eval");
             return this.dbClient.getLastEvaluation(db, collection);
         })
     }

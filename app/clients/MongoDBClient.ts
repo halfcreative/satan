@@ -62,12 +62,16 @@ export class MongoDBClient {
      * @memberof DBRepository
      */
     public getLastEvaluation(db: Db, collection: string): Promise<Evaluation> {
-        return db
-            .collection(collection)
-            .find({})
-            // .limit(1)
-            .sort({ $natural: -1 })
-            .toArray()[0];
+        // This function was changed to this promise format, because returning the pdirect promise was returning undefined.
+        return new Promise(function (resolve, reject) {
+            db.collection(collection).find().sort({ $natural: -1 }).toArray(function (err, docs) {
+                if (err) {
+                    console.error(err);
+                    return reject(err);
+                }
+                return resolve(docs[0]);
+            });
+        });
     }
 
 }
