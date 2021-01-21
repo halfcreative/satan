@@ -5,7 +5,6 @@ import { Evaluation, Indicators, MACD, PortfolioState } from "../models/Evaluati
 import { Account, LimitOrder, MarketOrder, OrderParams, ProductTicker } from "coinbase-pro";
 import * as CONSTANTS from "../constants/constants";
 import * as TA from "../utilities/TAUtils";
-import { constants } from "buffer";
 
 export class Evaluator {
 
@@ -35,6 +34,8 @@ export class Evaluator {
     private calculateIndicators(context: ContextModel): Indicators {
         console.info("Calculating Indicators");
         const indicators = new Indicators();
+        const highHistory = this.assetService.singleSetHistory(context.history, 1);
+        const lowHistory = this.assetService.singleSetHistory(context.history, 2);
         const closingHistory = this.assetService.singleSetHistory(context.history, 4); // get only the history of closing values
 
         indicators.sma50 = TA.sma(closingHistory, 50);
@@ -46,6 +47,8 @@ export class Evaluator {
         const macd = TA.macd(closingHistory, 20);
         const macdSignal = TA.macdSignal(macd);
         indicators.macd = context.lastEval ? new MACD(macd[0], macdSignal[0], context.lastEval.indicators.macd) : new MACD(macd[0], macdSignal[0]);
+
+        indicators.vi = TA.vi(highHistory, lowHistory, closingHistory, 20);
 
         return indicators;
     }
@@ -75,17 +78,17 @@ export class Evaluator {
     }
 
     /**
-         * Calculates the size of an order to place.
-         *
-         * @private
-         * @param {number} accountValue
-         * @param {Array<Account>} accounts
-         * @param {String} currency
-         * @param {ProductTicker} ticker
-         * @returns {String}
-         * @memberof Evaluator
-         */
-    private calculateOrderSize(currency: String, context: ContextModel, portfolioState: PortfolioState): string {
+     * Calculates the size of an order to place.
+     * 
+     * @private
+     * @param {number} accountValue
+     * @param {Array<Account>} accounts
+     * @param {string} currency
+     * @param {ProductTicker} ticker
+     * @returns {string}
+     * @memberof Evaluator
+     */
+    private calculateOrderSize(currency: string, context: ContextModel, portfolioState: PortfolioState): string {
         const riskAmount: number = CONSTANTS.RISK_PERCENT * portfolioState.totalValue;
         const maxOrderSize: number =
             (riskAmount * CONSTANTS.REWARD_RISK_RATIO) /

@@ -1,4 +1,4 @@
-import { OrderParams, Account, ProductTicker } from "coinbase-pro";
+import { OrderParams, Account } from "coinbase-pro";
 
 export class Evaluation {
     public date: Date;
@@ -30,6 +30,7 @@ export class Indicators {
     public ema26: number;
     public macd: MACD;
     public rsi14: number;
+    public vi: VortexIndicatorLines;
 }
 
 export class MACD {
@@ -63,6 +64,11 @@ export class MACD {
                     : false;
         }
     }
+}
+
+export class VortexIndicatorLines {
+    public uptrend: Array<number>;
+    public downtrend: Array<number>;
 }
 
 export class PortfolioState {
