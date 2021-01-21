@@ -1,3 +1,4 @@
+import { VortexIndicatorLines } from "models/EvaluationModel";
 
 /**
  * Get the simple moving average from a list of numbers.
@@ -112,4 +113,62 @@ export function averageChange(
         }
     }
     return sum / range;
+}
+/**
+ * Calculates the Vortex Indicator (vi) which is composed of an uptrend and downtrend line.
+ * 
+ * For more information :
+ * https://school.stockcharts.com/doku.php?id=technical_indicators:vortex_indicator
+ * @param high array of the daily highs from most recent to least recent.
+ * @param low array of daily lows from most recent to least recent.
+ * @param close array of the daily closing price from most recent to least recent.
+ * @param period the window to calculate the lines within. (between 14 and 30 days is common)
+ */
+export function vi(high: Array<number>, low: Array<number>, close: Array<number>, period: number): VortexIndicatorLines {
+    //Uptrend Movement
+    const pv = [];
+    //Downtrend Movement
+    const nv = [];
+    //Calculate Uptrend and Downtrend
+    const window = Math.min(high.length, low.length, close.length) - 1;
+    for (let i = 0; i < window; i++) {
+        pv.push(Math.abs(high[i] - low[i + 1]));
+        nv.push(Math.abs(low[i] - high[i + 1]));
+    }
+    //Get true range
+    const tr = trueRange(high, low, close);
+    //Sum the tr, nv and pv over the requested period
+    const sum = (accumulator, currentValue) => accumulator + currentValue;
+    const sumPV = pv.splice(0, period).reduce(sum);
+    const sumNV = nv.splice(0, period).reduce(sum);
+    const sumTR = tr.splice(0, period).reduce(sum);
+    //Calculate the uptrend and downtrend lines.
+    const vortexLines = new VortexIndicatorLines();
+
+    for (let i = 0; i < period; i++) {
+        vortexLines.uptrend.push(sumPV[i] / sumTR[i]);
+        vortexLines.downtrend.push(sumNV[i] / sumTR[i]);
+    }
+    return vortexLines;
+}
+
+/**
+ * Function to calculate the True Range of a set of prices.
+ * True Range is defined as the largest of the following:
+ * - The distance from today's high to today's low.
+ * - The distance from yesterday's close to today's high.
+ * - The distance from yesterday's close to today's low.
+ * 
+ * @param high array of the daily highs from most recent to least recent.
+ * @param low array of daily lows from most recent to least recent.
+ * @param close array of the daily closing price from most recent to least recent.
+ * @param close 
+ */
+export function trueRange(high: Array<number>, low: Array<number>, close: Array<number>) {
+    const trueRanges = [];
+    let range = Math.min(high.length, low.length, close.length) - 1;
+    for (let i = 0; i < range; i++) {
+        trueRanges.push(Math.max(high[i] - low[i], Math.abs(high[i] - close[i + 1]), Math.abs(low[i] - close[i + 1])));
+    }
+    return trueRanges;
 }

@@ -18,7 +18,7 @@ export class AssetService {
         return this.coinbase.getTicker(currency);
     }
 
-    public async getHistory(currency: string, range) {
+    public async getHistory(currency: string, range: number) {
         return this.coinbase.getHistoricRatesByDay(range, currency);
     }
 
