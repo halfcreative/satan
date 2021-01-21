@@ -126,9 +126,9 @@ export function averageChange(
  */
 export function vi(high: Array<number>, low: Array<number>, close: Array<number>, period: number): VortexIndicatorLines {
     //Uptrend Movement
-    const pv = [];
+    const pv: Array<number> = [];
     //Downtrend Movement
-    const nv = [];
+    const nv: Array<number> = [];
     //Calculate Uptrend and Downtrend
     const window = Math.min(high.length, low.length, close.length) - 1;
     for (let i = 0; i < window; i++) {
@@ -139,9 +139,14 @@ export function vi(high: Array<number>, low: Array<number>, close: Array<number>
     const tr = trueRange(high, low, close);
     //Sum the tr, nv and pv over the requested period
     const sum = (accumulator, currentValue) => accumulator + currentValue;
-    const sumPV = pv.splice(0, period).reduce(sum);
-    const sumNV = nv.splice(0, period).reduce(sum);
-    const sumTR = tr.splice(0, period).reduce(sum);
+    const sumPV: Array<number> = [];
+    const sumNV: Array<number> = [];
+    const sumTR: Array<number> = [];
+    for (let i = 0; i < (1 + period); i++) {
+        sumPV.push(pv.slice(i, i + period).reduce(sum));
+        sumNV.push(nv.slice(i, i + period).reduce(sum));
+        sumTR.push(tr.slice(i, i + period).reduce(sum));
+    }
     //Calculate the uptrend and downtrend lines.
     const vortexLines = new VortexIndicatorLines();
 
@@ -165,7 +170,7 @@ export function vi(high: Array<number>, low: Array<number>, close: Array<number>
  * @param close 
  */
 export function trueRange(high: Array<number>, low: Array<number>, close: Array<number>) {
-    const trueRanges = [];
+    const trueRanges: Array<number> = [];
     let range = Math.min(high.length, low.length, close.length) - 1;
     for (let i = 0; i < range; i++) {
         trueRanges.push(Math.max(high[i] - low[i], Math.abs(high[i] - close[i + 1]), Math.abs(low[i] - close[i + 1])));
