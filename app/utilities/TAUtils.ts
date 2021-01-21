@@ -1,4 +1,4 @@
-import { VortexIndicatorLines } from "models/EvaluationModel";
+import { VortexIndicatorLines } from "../models/EvaluationModel";
 
 /**
  * Get the simple moving average from a list of numbers.
