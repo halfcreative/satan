@@ -1,4 +1,4 @@
-import { SNSClient } from "clients/SNSClient";
+import { SNSClient } from "../clients/SNSClient";
 import { OrderParams } from "coinbase-pro";
 
 export class NotificationService {

@@ -1,4 +1,4 @@
-import { Evaluation } from "models/EvaluationModel";
+import { Evaluation } from "../models/EvaluationModel";
 import { Db, MongoClient } from "mongodb";
 
 const MONGODB_URI: string = process.env.MONGODB_URI;
