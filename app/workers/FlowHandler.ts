@@ -5,11 +5,13 @@ import { Executor } from "./Executor";
 import * as CONSTANTS from '../constants/constants';
 import { Aggregator } from "./InfoAggregator";
 import { DBService } from "../services/DatabaseService";
+import { NotificationService } from "../services/NotificationService";
 
 export class FlowHandler {
 
     private dbService: DBService;
     private assetService: AssetService;
+    private notificationService: NotificationService;
 
     private aggregator: Aggregator;
     private evaluator: Evaluator;
@@ -19,6 +21,7 @@ export class FlowHandler {
     constructor() {
         this.dbService = new DBService();
         this.assetService = new AssetService();
+        this.notificationService = new NotificationService();
     }
 
     /**
@@ -50,7 +53,7 @@ export class FlowHandler {
             this.evaluator = new Evaluator(this.assetService, this.dbService);
         }
         if (!this.executor) {
-            this.executor = new Executor(this.assetService, this.dbService);
+            this.executor = new Executor(this.assetService, this.dbService, this.notificationService);
         }
         // Automatic flow is as follows : gather context -> evaluate asset -> execute evaluation
         this.aggregator.gatherAssetInfo(CONSTANTS.BTCUSD).then(context => {
@@ -69,7 +72,7 @@ export class FlowHandler {
      */
     private commandFlow() {
         if (!this.executor) {
-            this.executor = new Executor(this.assetService, this.dbService);
+            this.executor = new Executor(this.assetService, this.dbService, this.notificationService);
         }
         console.log("Initiating External Command");
 

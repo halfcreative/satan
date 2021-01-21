@@ -9,9 +9,10 @@ export class Executor {
     private dbService: DBService;
     private notificationService: NotificationService;
 
-    constructor(assetService: AssetService, dbService: DBService) {
+    constructor(assetService: AssetService, dbService: DBService, notificationServ: NotificationService) {
         this.assetService = assetService;
         this.dbService = dbService;
+        this.notificationService = notificationServ;
     }
 
     public executeOrderFromEvaluation(evaluation: Evaluation) {
