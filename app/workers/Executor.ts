@@ -1,4 +1,4 @@
-import { OrderResult } from "coinbase-pro";
+import { NotificationService } from "../services/NotificationService";
 import { Evaluation } from "../models/EvaluationModel";
 import { AssetService } from "../services/AssetService";
 import { DBService } from "../services/DatabaseService";
@@ -7,6 +7,7 @@ export class Executor {
 
     private assetService: AssetService;
     private dbService: DBService;
+    private notificationService: NotificationService;
 
     constructor(assetService: AssetService, dbService: DBService) {
         this.assetService = assetService;
@@ -17,8 +18,14 @@ export class Executor {
         if (evaluation.orders.length > 0) {
             console.info("Order Request Confirmed");
             console.log(`${evaluation.orders.length} orders to place`);
-            return this.assetService.executeMultipleOrders(evaluation.orders);
+            return this.assetService.executeMultipleOrders(evaluation.orders).then(result => {
+                this.notificationService.sendOrderNotification(evaluation.price, evaluation.orders);
+                return result
+            }).catch(err => {
+                return err
+            });
         } else {
+            this.notificationService.sendTestNotification();
             return null;
         }
     }
