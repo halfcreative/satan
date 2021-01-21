@@ -29,6 +29,7 @@ export class AssetService {
          * 2 - Low, (trim down the history to just history of Lows)
          * 3 - Open, (trim down the history to just history of Open)
          * 4 - Close, (trim down the history to just history of Close)
+         * 5 - Volume, (trim down the history to just history of Volume)
          *
          * @param {Array<Array<number>>} history
          * @param {number} base
