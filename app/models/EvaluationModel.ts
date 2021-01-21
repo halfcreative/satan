@@ -67,8 +67,8 @@ export class MACD {
 }
 
 export class VortexIndicatorLines {
-    public uptrend: Array<number>;
-    public downtrend: Array<number>;
+    public uptrend: Array<number> = [];
+    public downtrend: Array<number> = [];
 }
 
 export class PortfolioState {
