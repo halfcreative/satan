@@ -26,7 +26,6 @@ export class Executor {
                 return err
             });
         } else {
-            await this.notificationService.sendTestNotification();
             return null;
         }
     }
