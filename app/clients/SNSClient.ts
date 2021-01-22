@@ -1,5 +1,5 @@
 import * as AWS from 'aws-sdk';
-const TOPIC_ARN: string = process.env.API_KEY;
+const TOPIC_ARN: string = process.env.TOPIC_ARN;
 const SNS = new AWS.SNS();
 
 export class SNSClient {
