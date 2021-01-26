@@ -1,7 +1,7 @@
 import {
     AuthenticatedClient,
     ProductTicker,
-    OrderParams, Account
+    OrderParams, Account, OrderFilter, OrderInfo, OrderResult
 } from "coinbase-pro";
 
 
@@ -10,6 +10,10 @@ const API_SECRET: string = process.env.API_SECRET;
 const PASS: string = process.env.PASS_PHRASE;
 const API_URI: string = process.env.API_URI;
 
+/**
+ * Refer here for REST API Documentation
+ * https://docs.pro.coinbase.com/
+ */
 export class CoinbaseAPIClient {
 
     private coinbaseProClient: AuthenticatedClient;
@@ -27,9 +31,6 @@ export class CoinbaseAPIClient {
         return this.coinbaseProClient.getProductTicker(currency);
     }
 
-    public getHistory() {
-        return this.coinbaseProClient.getProductHistoricRates
-    }
     /**
     * gets the historical rate of a specified currency across a specified time period.
     *
@@ -62,13 +63,32 @@ export class CoinbaseAPIClient {
     *
     * @param {OrderParams} order an OrderParams object returned from the Evaluator inside the evaluation;
     */
-    public executeOrder(order: OrderParams) {
+    public executeOrder(order: OrderParams): Promise<OrderResult> {
         return this.coinbaseProClient.placeOrder(order);
     }
 
 
     public getAccounts(): Promise<Array<Account>> {
         return this.coinbaseProClient.getAccounts();
+    }
+
+    public getOrders(product: string, status?: string): Promise<Array<OrderInfo>> {
+        let props: OrderFilter;
+        if (status) {
+            props = {
+                product_id: product,
+                status: status
+            }
+        } else {
+            props = {
+                product_id: product
+            }
+        }
+        return this.coinbaseProClient.getOrders(props)
+    }
+
+    public getOrder(id: string): Promise<OrderInfo> {
+        return this.coinbaseProClient.getOrder(id);
     }
 
 }
