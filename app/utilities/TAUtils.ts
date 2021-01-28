@@ -98,10 +98,9 @@ export function averageChange(
     range: number,
     gainsOrLosses: boolean
 ): number {
-    const reversedValues = values.slice(0).reverse();
     let sum: number = 0;
-    for (let i = 1; i < range + 1; i++) {
-        const change: number = reversedValues[i] - reversedValues[i - 1];
+    for (let i = 0; i < range; i++) {
+        const change: number = values[i] - values[i + 1];
         if (gainsOrLosses) {
             if (change > 0) {
                 sum += change;
@@ -114,6 +113,35 @@ export function averageChange(
     }
     return sum / range;
 }
+
+/**
+ * Similar to averageChange, averageROC (average rate of change) calucates the average percent change in either the positive or negative direction.
+ * 
+ * @param values array of prices from most recent to least recent.
+ * @param range the window of values to consider for calculation.
+ * @param gainsOrLosses true or false. true returns the average gain, and false returns the average loss 
+ */
+export function averageROC(
+    values: Array<number>,
+    range: number,
+    gainsOrLosses: boolean
+): number {
+    let sum: number = 0;
+    for (let i = 0; i < range; i++) {
+        const change: number = values[i] - values[i + 1];
+        if (gainsOrLosses) {
+            if (change > 0) {
+                sum += (change / values[i + 1]);
+            }
+        } else {
+            if (change < 0) {
+                sum += (Math.abs(change) / values[i + 1]);
+            }
+        }
+    }
+    return sum / range;
+}
+
 /**
  * Calculates the Vortex Indicator (vi) which is composed of an uptrend and downtrend line.
  * 
@@ -177,3 +205,4 @@ export function trueRange(high: Array<number>, low: Array<number>, close: Array<
     }
     return trueRanges;
 }
+
