@@ -4,7 +4,7 @@ export class Evaluation {
     public date: Date;
     public portfolioState: PortfolioState;
     public price: number;
-    public indicators: Indicators;
+    public technicalAnalysis: TechnicalAnalysis;
     public hindsight: Hindsight;
     public placeOrder: boolean;
     public orders: Array<OrderParams>;
@@ -23,7 +23,7 @@ export class Hindsight {
     public month: number;
 }
 
-export class Indicators {
+export class TechnicalAnalysis {
     public sma20: number;
     public sma50: number;
     public ema12: number;
@@ -31,6 +31,7 @@ export class Indicators {
     public macd: MACD;
     public rsi14: number;
     public vi: VortexIndicatorLines;
+    public averageRateOfChange: number;
 }
 
 export class MACD {

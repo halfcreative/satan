@@ -1,10 +1,10 @@
 import { AssetService } from "../services/AssetService";
 import { DBService } from "../services/DatabaseService";
 import { ContextModel } from "../models/ContextModel";
-import { Evaluation, Indicators, MACD, PortfolioState } from "../models/EvaluationModel";
+import { Evaluation, TechnicalAnalysis, MACD, PortfolioState } from "../models/EvaluationModel";
 import { Account, LimitOrder, MarketOrder, OrderParams, ProductTicker } from "coinbase-pro";
 import * as CONSTANTS from "../constants/constants";
-import * as TA from "../utilities/TAUtils";
+import * as TAUtils from "../utilities/TAUtils";
 
 export class Evaluator {
 
@@ -25,32 +25,34 @@ export class Evaluator {
         console.info("Generating Evaluation");
         const evaluation = new Evaluation();
         evaluation.price = parseFloat(context.ticker.price);
-        evaluation.indicators = this.calculateIndicators(context);
+        evaluation.technicalAnalysis = this.runTechnicalAnalysis(context);
         evaluation.portfolioState = this.evalutatePortfolioState(currency, context);
-        evaluation.orders = this.determineActions(currency, context, evaluation.indicators, evaluation.portfolioState);
+        evaluation.orders = this.determineActions(currency, context, evaluation.technicalAnalysis, evaluation.portfolioState);
         return evaluation;
     }
 
-    private calculateIndicators(context: ContextModel): Indicators {
+    private runTechnicalAnalysis(context: ContextModel): TechnicalAnalysis {
         console.info("Calculating Indicators");
-        const indicators = new Indicators();
+        const technicalAnalysis = new TechnicalAnalysis();
         const highHistory = this.assetService.singleSetHistory(context.history, 1);
         const lowHistory = this.assetService.singleSetHistory(context.history, 2);
         const closingHistory = this.assetService.singleSetHistory(context.history, 4); // get only the history of closing values
 
-        indicators.sma50 = TA.sma(closingHistory, 50);
-        indicators.sma20 = TA.sma(closingHistory, 20);
-        indicators.ema12 = TA.ema(closingHistory, 12)[0];
-        indicators.ema26 = TA.ema(closingHistory, 26)[0];
-        indicators.rsi14 = TA.rsi(closingHistory, 14);
+        technicalAnalysis.sma50 = TAUtils.sma(closingHistory, 50);
+        technicalAnalysis.sma20 = TAUtils.sma(closingHistory, 20);
+        technicalAnalysis.ema12 = TAUtils.ema(closingHistory, 12)[0];
+        technicalAnalysis.ema26 = TAUtils.ema(closingHistory, 26)[0];
+        technicalAnalysis.rsi14 = TAUtils.rsi(closingHistory, 14);
 
-        const macd = TA.macd(closingHistory, 20);
-        const macdSignal = TA.macdSignal(macd);
-        indicators.macd = context.lastEval ? new MACD(macd[0], macdSignal[0], context.lastEval.indicators.macd) : new MACD(macd[0], macdSignal[0]);
+        const macd = TAUtils.macd(closingHistory, 20);
+        const macdSignal = TAUtils.macdSignal(macd);
+        technicalAnalysis.macd = context.lastEval ? new MACD(macd[0], macdSignal[0], context.lastEval.technicalAnalysis.macd) : new MACD(macd[0], macdSignal[0]);
 
-        indicators.vi = TA.vi(highHistory, lowHistory, closingHistory, 20);
+        technicalAnalysis.vi = TAUtils.vi(highHistory, lowHistory, closingHistory, 20);
 
-        return indicators;
+        technicalAnalysis.averageRateOfChange = TAUtils.averageROC(closingHistory, 20, true);
+
+        return technicalAnalysis;
     }
 
     private evalutatePortfolioState(currency: string, context: ContextModel) {
@@ -90,9 +92,10 @@ export class Evaluator {
      */
     private calculateOrderSize(currency: string, context: ContextModel, portfolioState: PortfolioState): string {
         const riskAmount: number = CONSTANTS.RISK_PERCENT * portfolioState.totalValue;
+        const expectableRise: number = TAUtils.averageROC(this.assetService.singleSetHistory(context.history, 4), 20, true);
         const maxOrderSize: number =
             (riskAmount * CONSTANTS.REWARD_RISK_RATIO) /
-            CONSTANTS.EXPECTABLE_CHANGE;
+            expectableRise;
         const accountInQuestion: Array<Account> = context.accounts.filter(account => account.currency == currency);
         let orderSize: string;
         if (accountInQuestion.length > 0) {
@@ -138,12 +141,13 @@ export class Evaluator {
      * @memberof Evaluator
      */
     private calculateStopLossLimitOrderPricePoint(
-        ticker: ProductTicker
+        ticker: ProductTicker,
+        technicalAnalysis: TechnicalAnalysis
     ): string {
         return (
             parseFloat(ticker.price) -
             parseFloat(ticker.price) *
-            (CONSTANTS.EXPECTABLE_CHANGE / CONSTANTS.REWARD_RISK_RATIO)
+            (technicalAnalysis.averageRateOfChange / CONSTANTS.REWARD_RISK_RATIO)
         ).toFixed(CONSTANTS.USD_PRECISION);
     }
 
@@ -152,15 +156,15 @@ export class Evaluator {
      *
      * @private
      * @param {ProductTicker} ticker
-     * @param {Indicators} indicators
+     * @param {TechnicalAnalysis} technicalAnalysis
      * @param {Array<Account>} accounts
      * @param {AccountState} accountState
      * @returns {Array<OrderParams>} Array of orders. empty array if no order to be placed.
      * @memberof Evaluator
      */
-    private determineActions(currency: string, context: ContextModel, indicators: Indicators, portfolioState: PortfolioState,): Array<OrderParams> {
+    private determineActions(currency: string, context: ContextModel, technicalAnalysis: TechnicalAnalysis, portfolioState: PortfolioState,): Array<OrderParams> {
         let orders: Array<OrderParams> = [];
-        const macdActionSignal = this.evaluateMACD(indicators);
+        const macdActionSignal = this.evaluateMACD(technicalAnalysis);
         if (macdActionSignal == CONSTANTS.BUY) {
             const orderSize = this.calculateOrderSize(CONSTANTS.USD, context, portfolioState);
             const orderSizeNumber = parseFloat(orderSize);
@@ -176,8 +180,8 @@ export class Evaluator {
             const stopLossLimitOrder = {
                 type: CONSTANTS.LIMIT_ORDER,
                 side: CONSTANTS.SELL,
-                price: this.calculateStopLossLimitOrderPricePoint(context.ticker),
-                stop_price: this.calculateStopLossLimitOrderPricePoint(context.ticker),
+                price: this.calculateStopLossLimitOrderPricePoint(context.ticker, technicalAnalysis),
+                stop_price: this.calculateStopLossLimitOrderPricePoint(context.ticker, technicalAnalysis),
                 size: limitOrderSize,
                 product_id: currency,
                 stop: "loss"
@@ -209,10 +213,10 @@ export class Evaluator {
         return orders;
     }
 
-    private evaluateMACD(indicators: Indicators) {
+    private evaluateMACD(technicalAnalysis: TechnicalAnalysis) {
         // If Macd Crossed over the Signal line
-        if (indicators.macd.macdCrossoverSignal) {
-            if (indicators.macd.macdGTSignal) {
+        if (technicalAnalysis.macd.macdCrossoverSignal) {
+            if (technicalAnalysis.macd.macdGTSignal) {
                 // And macd is greater than signal
                 return CONSTANTS.BUY;
             } else {
