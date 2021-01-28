@@ -21,9 +21,9 @@ export class Executor {
             console.log(`${evaluation.orders.length} orders to place`);
             return this.assetService.executeMultipleOrders(evaluation.orders).then(async (result) => {
                 await this.notificationService.sendOrderNotification(evaluation.price, evaluation.orders);
-                return result
+                return result;
             }).catch(err => {
-                return err
+                return err;
             });
         } else {
             return null;
