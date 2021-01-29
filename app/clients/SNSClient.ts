@@ -9,7 +9,7 @@ export class SNSClient {
       Message: message, /* required */
       TopicArn: TOPIC_ARN
     };
-
+    console.info("Sending Message to AWS SNS");
     return SNS.publish(params).promise();
   }
 }

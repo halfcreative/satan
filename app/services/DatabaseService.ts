@@ -11,6 +11,7 @@ export class DBService {
     }
 
     public storeEvaluation(collection: string, evaluation: Evaluation): Promise<Evaluation> {
+        console.info(`Storing Evaluation`);
         return this.dbClient.connectToDatabase().then((db: Db) => {
             return this.dbClient.storeEvaluation(db, collection, evaluation).then(storedEval => { return storedEval });
         })
@@ -18,8 +19,8 @@ export class DBService {
     }
 
     public getMostRecentEvaluation(collection: string): Promise<Evaluation> {
+        console.info(`Retrieving Most Recent Evaluation`);
         return this.dbClient.connectToDatabase().then((db: Db) => {
-            console.log("getting last eval");
             return this.dbClient.getLastEvaluation(db, collection);
         })
     }

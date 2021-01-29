@@ -14,8 +14,7 @@ export class NotificationService {
     }
 
     public sendOrderNotification(price: number, orders: Array<OrderParams>) {
-
-
+        console.info("Sending Order Info")
         if (!this.snsClient) {
             this.snsClient = new SNSClient();
         }
