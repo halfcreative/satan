@@ -98,20 +98,22 @@ export function averageChange(
     range: number,
     gainsOrLosses: boolean
 ): number {
-    let sum: number = 0;
+    const sum = (accumulator, currentValue) => accumulator + currentValue;
+    const changes: Array<number> = [];
     for (let i = 0; i < range; i++) {
         const change: number = values[i] - values[i + 1];
         if (gainsOrLosses) {
             if (change > 0) {
-                sum += change;
+                changes.push(change);
             }
         } else {
             if (change < 0) {
-                sum += Math.abs(change);
+                changes.push(Math.abs(change));
             }
         }
     }
-    return sum / range;
+    const len = changes.length;
+    return changes.reduce(sum) / len;
 }
 
 /**
@@ -127,12 +129,9 @@ export function averageROC(
     gainsOrLosses: boolean
 ): number {
     const sum = (accumulator, currentValue) => accumulator + currentValue;
-    let percentDifArray: Array<number> = [];
+    const percentDifArray: Array<number> = [];
     for (let i = 0; i < range; i++) {
-        console.info(`${values[i]} - ${values[i + 1]}`);
         const change: number = values[i] - values[i + 1];
-        console.info(change);
-        console.info(`%${change / values[i + 1]} percent change`)
         if (gainsOrLosses) {
             if (change > 0) {
                 percentDifArray.push(change / values[i + 1]);
@@ -210,4 +209,3 @@ export function trueRange(high: Array<number>, low: Array<number>, close: Array<
     }
     return trueRanges;
 }
-

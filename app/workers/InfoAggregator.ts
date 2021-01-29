@@ -3,8 +3,10 @@ import { DBService } from "../services/DatabaseService";
 import { ContextModel } from "../models/ContextModel";
 
 export class Aggregator {
+
     private assetService: AssetService;
     private dbService: DBService
+
     constructor(assetService: AssetService, dbService: DBService) {
         this.assetService = assetService;
         this.dbService = dbService;

@@ -2,6 +2,7 @@ import { SNSClient } from "../clients/SNSClient";
 import { OrderParams } from "coinbase-pro";
 
 export class NotificationService {
+
     private snsClient: SNSClient;
 
     public sendTestNotification() {
@@ -13,8 +14,7 @@ export class NotificationService {
     }
 
     public sendOrderNotification(price: number, orders: Array<OrderParams>) {
-
-
+        console.info("Sending Order Info")
         if (!this.snsClient) {
             this.snsClient = new SNSClient();
         }

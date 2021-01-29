@@ -58,6 +58,7 @@ export class CoinbaseAPIClient {
                 granularity: 86400
             })
     }
+
     /**
     * sends a order request to the Coinbase API
     *
@@ -66,7 +67,6 @@ export class CoinbaseAPIClient {
     public executeOrder(order: OrderParams): Promise<OrderResult> {
         return this.coinbaseProClient.placeOrder(order);
     }
-
 
     public getAccounts(): Promise<Array<Account>> {
         return this.coinbaseProClient.getAccounts();
