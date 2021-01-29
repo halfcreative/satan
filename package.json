@@ -4,8 +4,8 @@
   "description": "Semi-Automatic Trading Assistant Network",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rm -r ./dist && tsc",
-    "package": "rm *.zip && zip -r satan.zip ./dist/* ./node_modules"
+    "build": "rm -rf ./dist && tsc",
+    "package": "rm -f *.zip && zip -r satan.zip ./dist/* ./node_modules"
   },
   "repository": {
     "type": "git",
