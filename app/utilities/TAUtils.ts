@@ -212,4 +212,3 @@ export function trueRange(high: Array<number>, low: Array<number>, close: Array<
     }
     return trueRanges;
 }
-

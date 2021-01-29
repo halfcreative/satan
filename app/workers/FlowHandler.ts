@@ -17,7 +17,6 @@ export class FlowHandler {
     private evaluator: Evaluator;
     private executor: Executor;
 
-
     constructor() {
         this.dbService = new DBService();
         this.assetService = new AssetService();

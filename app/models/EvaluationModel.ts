@@ -1,6 +1,7 @@
 import { OrderParams, Account } from "coinbase-pro";
 
 export class Evaluation {
+
     public date: Date;
     public portfolioState: PortfolioState;
     public price: number;
@@ -12,18 +13,21 @@ export class Evaluation {
     constructor() {
         this.date = new Date();
     }
+
 }
 
-
 export class Hindsight {
+
     public oneDay: number;
     public threeDay: number;
     public fiveDay: number;
     public tenDay: number;
     public month: number;
+
 }
 
 export class TechnicalAnalysis {
+
     public sma20: number;
     public sma50: number;
     public ema12: number;
@@ -32,9 +36,11 @@ export class TechnicalAnalysis {
     public rsi14: number;
     public vi: VortexIndicatorLines;
     public averageRateOfChange: number;
+
 }
 
 export class MACD {
+
     public macd: number;
     public macdSignal: number;
     public prevMACD: number;
@@ -65,14 +71,18 @@ export class MACD {
                     : false;
         }
     }
+
 }
 
 export class VortexIndicatorLines {
+
     public uptrend: Array<number> = [];
     public downtrend: Array<number> = [];
+
 }
 
 export class PortfolioState {
+
     public totalValue: number;
     public accounts: Array<Account>;
 
@@ -80,4 +90,5 @@ export class PortfolioState {
         this.totalValue = value;
         this.accounts = acnts;
     }
+
 }
