@@ -151,6 +151,17 @@ export class Evaluator {
         ).toFixed(CONSTANTS.USD_PRECISION);
     }
 
+    private calculatePriceTarget(
+        ticker: ProductTicker,
+        technicalAnalysis: TechnicalAnalysis
+    ): string {
+        return (
+            parseFloat(ticker.price) +
+            parseFloat(ticker.price) *
+            (technicalAnalysis.averageRateOfChange)
+        ).toFixed(CONSTANTS.USD_PRECISION);
+    }
+
     /**
      *
      *
@@ -163,36 +174,10 @@ export class Evaluator {
      * @memberof Evaluator
      */
     private determineActions(currency: string, context: ContextModel, technicalAnalysis: TechnicalAnalysis, portfolioState: PortfolioState,): Array<OrderParams> {
-        let orders: Array<OrderParams> = [];
+        const orders: Array<OrderParams> = [];
         const macdActionSignal = this.evaluateMACD(technicalAnalysis);
         if (macdActionSignal == CONSTANTS.BUY) {
-            const orderSize = this.calculateOrderSize(CONSTANTS.USD, context, portfolioState);
-            const orderSizeNumber = parseFloat(orderSize);
-            const limitOrderSize = (
-                orderSizeNumber / parseFloat(context.ticker.price)
-            ).toFixed(CONSTANTS.BTC_PRECISION);
-            const marketOrder = {
-                type: CONSTANTS.MARKET_ORDER,
-                side: CONSTANTS.BUY,
-                funds: orderSize,
-                product_id: currency
-            } as MarketOrder;
-            const stopLossLimitOrder = {
-                type: CONSTANTS.LIMIT_ORDER,
-                side: CONSTANTS.SELL,
-                price: this.calculateStopLossLimitOrderPricePoint(context.ticker, technicalAnalysis),
-                stop_price: this.calculateStopLossLimitOrderPricePoint(context.ticker, technicalAnalysis),
-                size: limitOrderSize,
-                product_id: currency,
-                stop: "loss"
-            } as LimitOrder;
-            if (
-                parseFloat(orderSize) > CONSTANTS.USD_MINIMUM &&
-                orderSizeNumber < CONSTANTS.USD_MAXIMUM
-            ) {
-                orders.push(marketOrder);
-                orders.push(stopLossLimitOrder);
-            }
+            this.craftTrade(currency, context, portfolioState, technicalAnalysis).forEach((order: OrderParams) => { orders.push(order) })
         } else if (macdActionSignal == CONSTANTS.SELL) {
             const orderSize = this.calculateOrderSize(currency.split('-')[0], context, portfolioState);
             const orderSizeNumber = parseFloat(orderSize);
@@ -211,6 +196,48 @@ export class Evaluator {
         }
 
         return orders;
+    }
+
+    private craftTrade(currency: string, context: ContextModel, portfolioState: PortfolioState, technicalAnalysis: TechnicalAnalysis): Array<OrderParams> {
+        const tradeOrders: Array<OrderParams> = [];
+        const orderSize = this.calculateOrderSize(CONSTANTS.USD, context, portfolioState);
+        const orderSizeNumber = parseFloat(orderSize);
+        if (
+            orderSizeNumber > CONSTANTS.BTC_MINIMUM &&
+            orderSizeNumber < CONSTANTS.BTC_MAXIMUM
+        ) {
+            const limitOrderSize = (
+                orderSizeNumber / parseFloat(context.ticker.price)
+            ).toFixed(CONSTANTS.BTC_PRECISION);
+            const marketOrder = {
+                type: CONSTANTS.MARKET_ORDER,
+                side: CONSTANTS.BUY,
+                funds: orderSize,
+                product_id: currency
+            } as MarketOrder;
+            const stopLossOrder = {
+                type: CONSTANTS.LIMIT_ORDER,
+                side: CONSTANTS.SELL,
+                price: this.calculateStopLossLimitOrderPricePoint(context.ticker, technicalAnalysis),
+                stop_price: this.calculateStopLossLimitOrderPricePoint(context.ticker, technicalAnalysis),
+                size: limitOrderSize,
+                product_id: currency,
+                stop: "loss"
+            } as LimitOrder;
+            const priceTargetOrder = {
+                type: CONSTANTS.LIMIT_ORDER,
+                side: CONSTANTS.SELL,
+                price: this.calculatePriceTarget(context.ticker, technicalAnalysis),
+                stop_price: this.calculatePriceTarget(context.ticker, technicalAnalysis),
+                size: limitOrderSize,
+                product_id: currency,
+                stop: "entry"
+            } as LimitOrder;
+            tradeOrders.push(marketOrder);
+            tradeOrders.push(stopLossOrder);
+            tradeOrders.push(priceTargetOrder);
+        }
+        return tradeOrders;
     }
 
     private evaluateMACD(technicalAnalysis: TechnicalAnalysis) {
