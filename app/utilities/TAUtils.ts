@@ -131,10 +131,7 @@ export function averageROC(
     const sum = (accumulator, currentValue) => accumulator + currentValue;
     const percentDifArray: Array<number> = [];
     for (let i = 0; i < range; i++) {
-        console.info(`${values[i]} - ${values[i + 1]}`);
         const change: number = values[i] - values[i + 1];
-        console.info(change);
-        console.info(`%${change / values[i + 1]} percent change`)
         if (gainsOrLosses) {
             if (change > 0) {
                 percentDifArray.push(change / values[i + 1]);
