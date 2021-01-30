@@ -1,4 +1,4 @@
-import { Handler, Context, Callback } from "aws-lambda";
+import 'dotenv/config'
 import { FlowHandler } from "./workers/FlowHandler";
 
 let flowHandler: FlowHandler | null = null;
@@ -9,14 +9,13 @@ let flowHandler: FlowHandler | null = null;
  * @param context Context object giving information about the lambda environment.
  * @param callback Callback object providing the callback function to exit the lambda.
  */
-const handler: Handler = (event: any, context: Context, callback: Callback) => {
-    context.callbackWaitsForEmptyEventLoop = false;
-
+const handler = async event => {
     if (!flowHandler) {
         flowHandler = new FlowHandler();
     }
-
-    flowHandler.initCodeFlow(event, callback);
+    const result = await flowHandler.initCodeFlow(event);
+    console.log(result);
+    process.exit();
 };
 
 export { handler };
