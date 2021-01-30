@@ -27,7 +27,7 @@ export class Executor {
                 return err;
             });
         } else {
-            return null;
+            return evaluation;
         }
     }
 }
