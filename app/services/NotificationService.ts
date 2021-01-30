@@ -1,5 +1,5 @@
 import { SNSClient } from "../clients/SNSClient";
-import { OrderParams } from "coinbase-pro";
+import { Trade } from "models/EvaluationModel";
 
 export class NotificationService {
 
@@ -13,13 +13,13 @@ export class NotificationService {
         return this.snsClient.publishMessage(message).then(res => { return true }).catch(err => { console.error(err, err.stack); return false });
     }
 
-    public sendOrderNotification(price: number, orders: Array<OrderParams>) {
+    public sendOrderNotification(price: number, trade: Trade) {
         console.info("Sending Order Info")
         if (!this.snsClient) {
             this.snsClient = new SNSClient();
         }
-        let message = `Placing the following order${orders.length > 1 ? 's' : ''}:\n`;
-        for (let order of orders) {
+        let message = `Placing the following order${trade.orderParams.length > 1 ? 's' : ''}:\n`;
+        for (let order of trade.orderParams) {
             message += `A ${order.type} ${order.side} order for ${order.size} of ${order.product_id} at ${price} totalling ${parseInt(order.size) * price}\n`;
         }
         return this.snsClient.publishMessage(message).then(res => { return true }).catch(err => { console.error(err, err.stack); return false });

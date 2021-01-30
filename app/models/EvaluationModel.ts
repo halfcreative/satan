@@ -1,14 +1,15 @@
-import { OrderParams, Account } from "coinbase-pro";
+import { OrderParams, Account, OrderResult } from "coinbase-pro";
 
 export class Evaluation {
 
     public date: Date;
+    public currency: string;
     public portfolioState: PortfolioState;
     public price: number;
     public technicalAnalysis: TechnicalAnalysis;
     public hindsight: Hindsight;
     public placeOrder: boolean;
-    public orders: Array<OrderParams>;
+    public trade: Trade | null;
 
     constructor() {
         this.date = new Date();
@@ -91,4 +92,20 @@ export class PortfolioState {
         this.accounts = acnts;
     }
 
+}
+
+export class Trade {
+    public orderParams: Array<OrderParams>;
+    public orderReciepts: Array<OrderResult>;
+    public result: number = 0; // 0 for no result, 1 for win , 2 for loss
+
+    public getOrderIds() {
+        const ids: Array<string> = [];
+        if (this.orderReciepts) {
+            for (const order of this.orderReciepts) {
+                ids.push(order.id);
+            }
+        }
+        return ids;
+    }
 }

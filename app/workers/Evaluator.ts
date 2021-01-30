@@ -1,33 +1,26 @@
 import { AssetService } from "../services/AssetService";
-import { DBService } from "../services/DatabaseService";
 import { ContextModel } from "../models/ContextModel";
-import { Evaluation, TechnicalAnalysis, MACD, PortfolioState } from "../models/EvaluationModel";
-import { Account, LimitOrder, MarketOrder, OrderParams, ProductTicker } from "coinbase-pro";
+import { Evaluation, TechnicalAnalysis, MACD, PortfolioState, Trade } from "../models/EvaluationModel";
+import { Account, LimitOrder, MarketOrder, ProductTicker } from "coinbase-pro";
 import * as CONSTANTS from "../constants/constants";
 import * as TAUtils from "../utilities/TAUtils";
 
 export class Evaluator {
 
     private assetService: AssetService;
-    private dbService: DBService;
 
-    constructor(assetService: AssetService, dbService: DBService) {
+    constructor(assetService: AssetService) {
         this.assetService = assetService;
-        this.dbService = dbService;
     }
 
-    public evaluateAssetAndStoreEvaluation(currency: string, context: ContextModel): Promise<Evaluation> {
-        const evaluation = this.generateFullEvaluation(currency, context);
-        return this.storeEvaluation(currency, evaluation);
-    }
-
-    private generateFullEvaluation(currency: string, context: ContextModel): Evaluation {
+    public generateFullEvaluation(currency: string, context: ContextModel): Evaluation {
         console.info("Generating Evaluation");
         const evaluation = new Evaluation();
+        evaluation.currency = currency;
         evaluation.price = parseFloat(context.ticker.price);
         evaluation.technicalAnalysis = this.runTechnicalAnalysis(context);
         evaluation.portfolioState = this.evalutatePortfolioState(currency, context);
-        evaluation.orders = this.determineActions(currency, context, evaluation.technicalAnalysis, evaluation.portfolioState);
+        evaluation.trade = this.determineActions(currency, context, evaluation.technicalAnalysis, evaluation.portfolioState);
         return evaluation;
     }
 
@@ -75,9 +68,7 @@ export class Evaluator {
         return new PortfolioState(portfolioValue, context.accounts);
     }
 
-    private storeEvaluation(currency: string, evaluation: Evaluation): Promise<Evaluation> {
-        return this.dbService.storeEvaluation(currency, evaluation);
-    }
+
 
     /**
      * Calculates the size of an order to place.
@@ -151,6 +142,17 @@ export class Evaluator {
         ).toFixed(CONSTANTS.USD_PRECISION);
     }
 
+    private calculatePriceTarget(
+        ticker: ProductTicker,
+        technicalAnalysis: TechnicalAnalysis
+    ): string {
+        return (
+            parseFloat(ticker.price) +
+            parseFloat(ticker.price) *
+            (technicalAnalysis.averageRateOfChange)
+        ).toFixed(CONSTANTS.USD_PRECISION);
+    }
+
     /**
      *
      *
@@ -162,38 +164,63 @@ export class Evaluator {
      * @returns {Array<OrderParams>} Array of orders. empty array if no order to be placed.
      * @memberof Evaluator
      */
-    private determineActions(currency: string, context: ContextModel, technicalAnalysis: TechnicalAnalysis, portfolioState: PortfolioState,): Array<OrderParams> {
-        let orders: Array<OrderParams> = [];
+    private determineActions(currency: string, context: ContextModel, technicalAnalysis: TechnicalAnalysis, portfolioState: PortfolioState,): Trade | null {
+        let trade: Trade = null;
         const macdActionSignal = this.evaluateMACD(technicalAnalysis);
         if (macdActionSignal == CONSTANTS.BUY) {
+            // buy action
+            trade = this.craftTrade(currency, context, portfolioState, technicalAnalysis, true);
+        } else if (macdActionSignal == CONSTANTS.SELL) {
+            // sell action
+            trade = this.craftTrade(currency, context, portfolioState, technicalAnalysis, false);
+        } else {
+            // no action
+        }
+        return trade;
+    }
+
+    private craftTrade(currency: string, context: ContextModel, portfolioState: PortfolioState, technicalAnalysis: TechnicalAnalysis, buy: boolean): Trade {
+        const trade = new Trade();
+        trade.orderParams = [];
+        if (buy) {
             const orderSize = this.calculateOrderSize(CONSTANTS.USD, context, portfolioState);
             const orderSizeNumber = parseFloat(orderSize);
-            const limitOrderSize = (
-                orderSizeNumber / parseFloat(context.ticker.price)
-            ).toFixed(CONSTANTS.BTC_PRECISION);
-            const marketOrder = {
-                type: CONSTANTS.MARKET_ORDER,
-                side: CONSTANTS.BUY,
-                funds: orderSize,
-                product_id: currency
-            } as MarketOrder;
-            const stopLossLimitOrder = {
-                type: CONSTANTS.LIMIT_ORDER,
-                side: CONSTANTS.SELL,
-                price: this.calculateStopLossLimitOrderPricePoint(context.ticker, technicalAnalysis),
-                stop_price: this.calculateStopLossLimitOrderPricePoint(context.ticker, technicalAnalysis),
-                size: limitOrderSize,
-                product_id: currency,
-                stop: "loss"
-            } as LimitOrder;
             if (
-                parseFloat(orderSize) > CONSTANTS.USD_MINIMUM &&
-                orderSizeNumber < CONSTANTS.USD_MAXIMUM
+                orderSizeNumber > CONSTANTS.BTC_MINIMUM &&
+                orderSizeNumber < CONSTANTS.BTC_MAXIMUM
             ) {
-                orders.push(marketOrder);
-                orders.push(stopLossLimitOrder);
+                const limitOrderSize = (
+                    orderSizeNumber / parseFloat(context.ticker.price)
+                ).toFixed(CONSTANTS.BTC_PRECISION);
+                const marketOrder = {
+                    type: CONSTANTS.MARKET_ORDER,
+                    side: CONSTANTS.BUY,
+                    funds: orderSize,
+                    product_id: currency
+                } as MarketOrder;
+                const stopLossOrder = {
+                    type: CONSTANTS.LIMIT_ORDER,
+                    side: CONSTANTS.SELL,
+                    price: this.calculateStopLossLimitOrderPricePoint(context.ticker, technicalAnalysis),
+                    stop_price: this.calculateStopLossLimitOrderPricePoint(context.ticker, technicalAnalysis),
+                    size: limitOrderSize,
+                    product_id: currency,
+                    stop: "loss"
+                } as LimitOrder;
+                const priceTargetOrder = {
+                    type: CONSTANTS.LIMIT_ORDER,
+                    side: CONSTANTS.SELL,
+                    price: this.calculatePriceTarget(context.ticker, technicalAnalysis),
+                    stop_price: this.calculatePriceTarget(context.ticker, technicalAnalysis),
+                    size: limitOrderSize,
+                    product_id: currency,
+                    stop: "entry"
+                } as LimitOrder;
+                trade.orderParams.push(marketOrder);
+                trade.orderParams.push(stopLossOrder);
+                trade.orderParams.push(priceTargetOrder);
             }
-        } else if (macdActionSignal == CONSTANTS.SELL) {
+        } else {
             const orderSize = this.calculateOrderSize(currency.split('-')[0], context, portfolioState);
             const orderSizeNumber = parseFloat(orderSize);
             const sellOrder = {
@@ -206,11 +233,12 @@ export class Evaluator {
                 parseFloat(orderSize) > CONSTANTS.BTC_MINIMUM &&
                 orderSizeNumber < CONSTANTS.BTC_MAXIMUM
             ) {
-                orders.push(sellOrder);
+                trade.orderParams.push(sellOrder);
             }
         }
 
-        return orders;
+
+        return trade;
     }
 
     private evaluateMACD(technicalAnalysis: TechnicalAnalysis) {

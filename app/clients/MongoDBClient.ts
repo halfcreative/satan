@@ -1,4 +1,4 @@
-import { Evaluation } from "../models/EvaluationModel";
+import { Evaluation, Trade } from "../models/EvaluationModel";
 import { Db, MongoClient } from "mongodb";
 
 const MONGODB_URI: string = process.env.MONGODB_URI;
@@ -37,34 +37,51 @@ export class MongoDBClient {
 
     public storeEvaluation(
         db: Db,
-        collection: string,
-        data: any
+        data: Evaluation
     ): Promise<Evaluation> {
         return db
-            .collection(collection)
+            .collection("evaluations")
             .insertOne(data)
             .then(() => {
                 console.info("***Evaluation Stored Successfully***");
                 return data;
             })
             .catch(e => {
-                console.error(`Error: storeEvaluation - collection(${collection}).insertOne(${data}) encountered an exception`);
+                console.error(`Error: storeEvaluation - collection(evaluations).insertOne(${data}) encountered an exception`);
                 console.error(e);
                 return null;
             });
     }
 
-    /**
+    public storeTrade(
+        db: Db,
+        data: Trade
+    ): Promise<Trade> {
+        return db
+            .collection("trades")
+            .insertOne(data)
+            .then(() => {
+                console.info("***Trade Stored Successfully***");
+                return data;
+            })
+            .catch(e => {
+                console.error(`Error: storeTrade - collection(trades).insertOne(${data}) encountered an exception`);
+                console.error(e);
+                return null;
+            });
+    }
+
+    /*
      * retrieves the previous evaluation from the database.
      *
      * @param {Db} db
      * @returns {Promise<Array<any>>}
      * @memberof DBRepository
      */
-    public getLastEvaluation(db: Db, collection: string): Promise<Evaluation> {
+    public getLastEvaluation(db: Db): Promise<Evaluation> {
         // This function was changed to this promise format, because returning the pdirect promise was returning undefined.
         return new Promise(function (resolve, reject) {
-            db.collection(collection).find().sort({ $natural: -1 }).toArray(function (err, docs) {
+            db.collection("evaluations").find().sort({ $natural: -1 }).toArray(function (err, docs) {
                 if (err) {
                     console.error(err);
                     return reject(err);

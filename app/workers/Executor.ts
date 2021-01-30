@@ -15,13 +15,14 @@ export class Executor {
         this.notificationService = notificationServ;
     }
 
-    public async executeOrderFromEvaluation(evaluation: Evaluation) {
-        if (evaluation.orders.length > 0) {
-            console.info("Order Request Confirmed");
-            console.log(`${evaluation.orders.length} orders to place`);
-            return this.assetService.executeMultipleOrders(evaluation.orders).then(async (result) => {
-                await this.notificationService.sendOrderNotification(evaluation.price, evaluation.orders);
-                return result;
+    public async executeOrderFromEvaluation(evaluation: Evaluation): Promise<Evaluation> {
+        if (evaluation.trade) {
+            console.info("Trade Request Confirmed");
+            console.log(`${evaluation.trade.orderParams} orders to place`);
+            return this.assetService.executeMultipleOrders(evaluation.trade.orderParams).then(async (result) => {
+                evaluation.trade.orderReciepts = result;
+                await this.notificationService.sendOrderNotification(evaluation.price, evaluation.trade);
+                return evaluation;
             }).catch(err => {
                 return err;
             });
