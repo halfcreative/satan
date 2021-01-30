@@ -6,6 +6,7 @@ import * as CONSTANTS from '../constants/constants';
 import { Aggregator } from "./InfoAggregator";
 import { DBService } from "../services/DatabaseService";
 import { NotificationService } from "../services/NotificationService";
+import { Auditor } from "./Auditor";
 
 export class FlowHandler {
 
@@ -16,6 +17,7 @@ export class FlowHandler {
     private aggregator: Aggregator;
     private evaluator: Evaluator;
     private executor: Executor;
+    private auditor: Auditor;
 
     constructor() {
         this.dbService = new DBService();
@@ -49,18 +51,23 @@ export class FlowHandler {
             this.aggregator = new Aggregator(this.assetService, this.dbService);
         }
         if (!this.evaluator) {
-            this.evaluator = new Evaluator(this.assetService, this.dbService);
+            this.evaluator = new Evaluator(this.assetService);
         }
         if (!this.executor) {
             this.executor = new Executor(this.assetService, this.dbService, this.notificationService);
         }
+        if (!this.auditor) {
+            this.auditor = new Auditor(this.dbService);
+        }
         // Automatic flow is as follows : gather context -> evaluate asset -> execute evaluation
         this.aggregator.gatherAssetInfo(CONSTANTS.BTCUSD).then(context => {
-            return this.evaluator.evaluateAssetAndStoreEvaluation(CONSTANTS.BTCUSD, context);
+            return this.evaluator.generateFullEvaluation(CONSTANTS.BTCUSD, context);
         }).then(evaluation => {
             return this.executor.executeOrderFromEvaluation(evaluation);
-        }).then(orderResults => {
-            callback(null, orderResults);
+        }).then(evaluation => {
+            return this.auditor.runAudit(evaluation);
+        }).then(evaluation => {
+            callback(null, evaluation);
         }).catch(error => {
             callback(error);
         })
