@@ -9,13 +9,17 @@ let flowHandler: FlowHandler | null = null;
  * @param context Context object giving information about the lambda environment.
  * @param callback Callback object providing the callback function to exit the lambda.
  */
-const handler = async event => {
+const handler = async (event, context?) => {
     if (!flowHandler) {
         flowHandler = new FlowHandler();
     }
     const result = await flowHandler.initCodeFlow(event);
-    console.log(result);
-    process.exit();
+    if (!context) {
+        console.log(result);
+        process.exit();
+    } else {
+        return result;
+    }
 };
 
 export { handler };
