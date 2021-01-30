@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "scripts": {
     "build": "rm -rf ./dist && tsc",
-    "package": "rm -f *.zip && zip -r satan.zip ./dist/* ./node_modules"
+    "package": "rm -f *.zip && zip -r satan.zip ./dist/* ./node_modules",
+    "handler": "node -e 'require(\"./dist/index\").handler()'"
   },
   "repository": {
     "type": "git",
@@ -20,6 +21,7 @@
   "dependencies": {
     "aws-lambda": "^1.0.6",
     "coinbase-pro": "^0.9.0",
+    "dotenv": "^8.2.0",
     "mongodb": "^3.6.0"
   },
   "devDependencies": {

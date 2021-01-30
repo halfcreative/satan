@@ -1,4 +1,3 @@
-import { Callback } from "aws-lambda";
 import { AssetService } from "../services/AssetService";
 import { Evaluator } from "./Evaluator";
 import { Executor } from "./Executor";
@@ -33,19 +32,19 @@ export class FlowHandler {
      * @param event The event that initiated this lambda call
      * @param callback Callback function to end the lambda.
      */
-    public initCodeFlow(event: any, callback: Callback) {
+    public initCodeFlow(event: any) {
         console.info(`Event Recieved : ${JSON.stringify(event)}`);
         if (this.commandEventCheck(event)) {
-            this.commandFlow();
+            return this.commandFlow();
         } else {
-            this.autoFlow(callback);
+            return this.autoFlow();
         }
     }
 
     /**
      * runs the code sequence for automated analysis.
      */
-    private autoFlow(callback: Callback): void {
+    private autoFlow() {
         // Initiate the worker classes if not already present
         if (!this.aggregator) {
             this.aggregator = new Aggregator(this.assetService, this.dbService);
@@ -60,16 +59,16 @@ export class FlowHandler {
             this.auditor = new Auditor(this.dbService);
         }
         // Automatic flow is as follows : gather context -> evaluate asset -> execute evaluation
-        this.aggregator.gatherAssetInfo(CONSTANTS.BTCUSD).then(context => {
+        return this.aggregator.gatherAssetInfo(CONSTANTS.BTCUSD).then(context => {
             return this.evaluator.generateFullEvaluation(CONSTANTS.BTCUSD, context);
         }).then(evaluation => {
             return this.executor.executeOrderFromEvaluation(evaluation);
         }).then(evaluation => {
             return this.auditor.runAudit(evaluation);
         }).then(evaluation => {
-            callback(null, evaluation);
+            return evaluation;
         }).catch(error => {
-            callback(error);
+            return error;
         })
     }
 
@@ -81,14 +80,19 @@ export class FlowHandler {
             this.executor = new Executor(this.assetService, this.dbService, this.notificationService);
         }
         console.log("Initiating External Command");
+        return true;
 
     }
 
     private commandEventCheck(event: any) {
-        if (event.source && event.source == "aws.events") {
+        if (event) {
+            if (event.source && event.source == "aws.events") {
+                return false;
+            }
+            return true;
+        } else {
             return false;
         }
-        return true;
     }
 
 }
