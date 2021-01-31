@@ -12,7 +12,7 @@ Beyond the basic functionality of a trading bot, I also intend for satan to cons
 Satan only supports the trading of cryptocurrency through Coinbase PRO. - I intend to add support for more platforms in the future.
 Satan only supports notifications through the use of AWS SNS while operating through AWS Lambda. - I intend to also add basic email support in the future.
 
-## Installation (poor instructions - will improve in the future)
+# Installation (poor instructions - will improve in the future)
 At the present moment, SATAN has no automated deployment procedures.
 
 Satan can either be run locally or as an AWS Lambda function.
@@ -26,7 +26,7 @@ You can create an account with the services here:
 [MongoDB](https://www.mongodb.com/)
 [Coinbase Pro](https://pro.coinbase.com/)
 
-#### Install Locally for development and testing
+# Install Locally for development and testing
 
 Download/Clone this repository.
 Proceed to change directory to this repo, then install the project.
@@ -37,16 +37,10 @@ cd satan
 npm install
 ```
 
-You will need to create a .env file in the root of the repository, containing the following environment variables:
+You will need to create a .env file in the root of the repository, containing the following [environment variables](#Evnironment-Variables):
 
-```
-API_KEY=CoinbaseProAPIKey
-API_SECRET=CoinbaseProAPIKeySecret
-DB_NAME=MongoDBDatabaseName
-MONGODB_URI=MongoDBURI
-PASS_PHRASE=MongoDBPassPhrase
-TOPIC_ARN=AWSSNSTopicARN
-```
+
+
 
 Before running, build the project (compile down the typescript to js) using:
 
@@ -59,7 +53,7 @@ then run the project using:
 npm run handler
 ```
 
-#### Configure to run consistently on AWS
+# Configure to run consistently on AWS
 
 Download/Clone this repository.
 Proceed to change directory to this repo, then install and build the project.
@@ -68,22 +62,36 @@ Proceed to change directory to this repo, then install and build the project.
 git clone https://github.com/halfcreative/satan.git
 cd satan
 npm install
-npm build
+npm run build
+npm run package
 ```
 
 Take the resulting satan.zip file, and upload it to AWS Lambda.
 
-In the aws console configure the following environment variables:
+In the aws console configure the [environment variables](#Evnironment-Variables) 
+
+configure a cloudwatch even on a chron timer to call the lambda on a specified interval and you've got a running instance of Satan.
+
+
+# Environment Variables
+
 ```
 API_KEY=CoinbaseProAPIKey
 API_SECRET=CoinbaseProAPIKeySecret
+PASS_PHRASE=CoinbaseProAPIPassPhrase
 DB_NAME=MongoDBDatabaseName
 MONGODB_URI=MongoDBURI
-PASS_PHRASE=MongoDBPassPhrase
 TOPIC_ARN=AWSSNSTopicARN
 ```
 
-configure a cloudwatch even on a chron timer to call the lambda on a specified interval and you've got a running instance of Satan.
+To be able to buy and sell cryptocurrency, satan requries access to the coinbase pro private api. To enable this access, satan requires an API_KEY, API_SECRET and PASS_PHRASE. To get the API_KEY, API_SECRET and PASS_PHRASE, you will need to generate an api key using your coinbase pro account.
+[Coinbase Pro API Key Instructions](https://help.coinbase.com/en/pro/other-topics/api/how-do-i-create-an-api-key-for-coinbase-pro)
+
+Satan requires mongodb as it's database, and therefore requires the env variable MONGODB_URI. This is a connection string URI, either from your local mongodb instance, or from a managed MongoDB Atlas cluster following the instructions here:
+[MongoDB Connect to cluster tutorial](https://docs.atlas.mongodb.com/tutorial/connect-to-your-cluster)
+DB_NAME should be the same database name provided in the URI.
+
+To Utilize AWS SNS, you will need to provide TOPIC_ARN, and also configure the AWS_Lambda with the permissions to publish messages to the topic.
 
 ## Contributing
 Suggestions and Pull requests are welcome. For major changes, please open an issue first to discuss what you would like to change.
