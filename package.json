@@ -13,7 +13,7 @@
     "url": "git+https://github.com/halfcreative/satan.git"
   },
   "author": "Alan Sato",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/halfcreative/satan/issues"
   },
