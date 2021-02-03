@@ -50,7 +50,6 @@ export class Evaluator {
 
     private evalutatePortfolioState(currency: string, context: ContextModel) {
         console.info("-- Evaluating Account Info --");
-        console.info("Accounts : ", context.accounts);
         let portfolioValue: number = 0;
         for (const account of context.accounts) {
             if (account.currency == CONSTANTS.USD) {
@@ -93,9 +92,7 @@ export class Evaluator {
             const account: Account = accountInQuestion[0];
             if (currency == CONSTANTS.USD) {
                 if (maxOrderSize > parseFloat(account.balance)) {
-                    orderSize = parseFloat(account.balance).toFixed(
-                        CONSTANTS.USD_PRECISION
-                    );
+                    orderSize = (Math.trunc(parseFloat(account.balance) * 100) / 100).toFixed(CONSTANTS.USD_PRECISION);
                 } else {
                     orderSize = maxOrderSize.toFixed(
                         CONSTANTS.USD_PRECISION
@@ -253,7 +250,6 @@ export class Evaluator {
             }
         }
         return CONSTANTS.NA;
-
     }
 
 }

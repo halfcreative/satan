@@ -18,13 +18,17 @@ export class Executor {
     public async executeOrderFromEvaluation(evaluation: Evaluation): Promise<Evaluation> {
         if (evaluation.trade) {
             console.info("Trade Request Confirmed");
-            console.log(`${evaluation.trade.orderParams} orders to place`);
+            console.log(`${evaluation.trade.orderParams.length} orders to place`);
+            console.log(evaluation.trade);
             return this.assetService.executeMultipleOrders(evaluation.trade.orderParams).then(async (result) => {
                 evaluation.trade.orderReciepts = result;
                 await this.notificationService.sendOrderNotification(evaluation.price, evaluation.trade);
                 return evaluation;
             }).catch(err => {
-                return err;
+                console.error("Error Placing Trade");
+                console.error(err);
+                evaluation.trade = null;
+                return evaluation;
             });
         } else {
             return evaluation;
