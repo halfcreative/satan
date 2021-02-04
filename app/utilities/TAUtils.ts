@@ -1,4 +1,4 @@
-import { VortexIndicatorLines } from "../models/EvaluationModel";
+import { IchimokuCloud, VortexIndicatorLines } from "../models/EvaluationModel";
 
 /**
  * Get the simple moving average from a list of numbers.
@@ -199,7 +199,6 @@ export function vi(high: Array<number>, low: Array<number>, close: Array<number>
  * @param high array of the daily highs from most recent to least recent.
  * @param low array of daily lows from most recent to least recent.
  * @param close array of the daily closing price from most recent to least recent.
- * @param close 
  */
 export function trueRange(high: Array<number>, low: Array<number>, close: Array<number>) {
     const trueRanges: Array<number> = [];
@@ -209,3 +208,29 @@ export function trueRange(high: Array<number>, low: Array<number>, close: Array<
     }
     return trueRanges;
 }
+
+/**
+ * Calculates the Ichimoku Kinko Hyo Indicator
+ * 
+ * For more information :
+ * https://school.stockcharts.com/doku.php?id=technical_indicators:ichimoku_cloud
+ * @param high array of the daily highs from most recent to least recent.
+ * @param low array of daily lows from most recent to least recent.
+ * @param close array of the daily closing price from most recent to least recent.
+ */
+export function ihk(highs: Array<number>, lows: Array<number>, close: Array<number>) {
+    const cloud: IchimokuCloud = new IchimokuCloud();
+    //Tenkan-sen (Conversion Line): (x-period high + x-period low)/2)) (x is typically 9)
+    cloud.tenkaSen = (Math.max(...highs.slice(0, 9)) + Math.min(...lows.slice(0, 9))) / 2;
+    //Kijun-sen (Base Line): (y-period high + y-period low)/2)) (y is typically 26)
+    cloud.kijunSen = (Math.max(...highs.slice(0, 26)) + Math.min(...lows.slice(0, 26))) / 2;
+    //Senkou Span A (Leading Span A): (Conversion Line + Base Line)/2))
+    cloud.senkouSpanA = (cloud.tenkaSen + cloud.kijunSen) / 2;
+    //Senkou Span B (Leading Span B): (52-period high + 52-period low)/2))
+    cloud.senkouSpanB = (Math.max(...highs.slice(0, 52)) + Math.min(...lows.slice(0, 52))) / 2;
+    //Chikou Span (Lagging Span): Close plotted 26 days in the past
+    cloud.chikouSpan = close[26];
+    return cloud;
+}
+
+

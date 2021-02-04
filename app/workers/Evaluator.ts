@@ -43,6 +43,8 @@ export class Evaluator {
 
         technicalAnalysis.vi = TAUtils.vi(highHistory, lowHistory, closingHistory, 20);
 
+        technicalAnalysis.ichimokuCloud = TAUtils.ihk(highHistory, lowHistory, closingHistory);
+
         technicalAnalysis.averageRateOfChange = TAUtils.averageROC(closingHistory, 20, true);
 
         return technicalAnalysis;
