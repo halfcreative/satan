@@ -37,6 +37,7 @@ export class TechnicalAnalysis {
     public rsi14: number;
     public vi: VortexIndicatorLines;
     public averageRateOfChange: number;
+    public ichimokuCloud: IchimokuCloud;
 
 }
 
@@ -80,6 +81,14 @@ export class VortexIndicatorLines {
     public uptrend: Array<number> = [];
     public downtrend: Array<number> = [];
 
+}
+
+export class IchimokuCloud {
+    public tenkaSen: number;
+    public kijunSen: number;
+    public senkouSpanA: number;
+    public senkouSpanB: number;
+    public chikouSpan: number;
 }
 
 export class PortfolioState {
