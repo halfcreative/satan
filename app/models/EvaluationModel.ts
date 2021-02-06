@@ -38,6 +38,7 @@ export class TechnicalAnalysis {
     public vi: VortexIndicatorLines;
     public averageRateOfChange: number;
     public ichimokuCloud: IchimokuCloud;
+    public obv: number;
 
 }
 
