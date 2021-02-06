@@ -233,4 +233,28 @@ export function ihk(highs: Array<number>, lows: Array<number>, close: Array<numb
     return cloud;
 }
 
+/**
+ * Calculates the On-Balance Volume of an asset.
+ * 
+ * For more information :
+ * https://school.stockcharts.com/doku.php?id=technical_indicators:on_balance_volume_obv
+ * @param close array of the daily closing price from most recent to least recent.
+ * @param volumes array of daily volume from most recent to least recent.
+ * @param period the number of days to calculate obv for
+ */
+export function obv(close: Array<number>, volumes: Array<number>, period: number): number {
+    let total = 0;
+    for (let i = 0; i < period; i++) {
+        if (i == 0) {
+            total = volumes[0];
+        } else {
+            if (close[i] > close[i - 1]) {
+                total += volumes[i];
+            } else if (close[i] < close[i - 1]) {
+                total -= volumes[i]
+            }
+        }
+    }
+    return total;
+}
 

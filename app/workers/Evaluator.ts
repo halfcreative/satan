@@ -29,13 +29,16 @@ export class Evaluator {
         const technicalAnalysis = new TechnicalAnalysis();
         const highHistory = this.assetService.singleSetHistory(context.history, 1);
         const lowHistory = this.assetService.singleSetHistory(context.history, 2);
-        const closingHistory = this.assetService.singleSetHistory(context.history, 4); // get only the history of closing values
+        const closingHistory = this.assetService.singleSetHistory(context.history, 4);
+        const volumeHistory = this.assetService.singleSetHistory(context.history, 5);
 
         technicalAnalysis.sma50 = TAUtils.sma(closingHistory, 50);
         technicalAnalysis.sma20 = TAUtils.sma(closingHistory, 20);
         technicalAnalysis.ema12 = TAUtils.ema(closingHistory, 12)[0];
         technicalAnalysis.ema26 = TAUtils.ema(closingHistory, 26)[0];
         technicalAnalysis.rsi14 = TAUtils.rsi(closingHistory, 14);
+
+        technicalAnalysis.obv = TAUtils.obv(closingHistory, volumeHistory, 50)
 
         const macd = TAUtils.macd(closingHistory, 20);
         const macdSignal = TAUtils.macdSignal(macd);
