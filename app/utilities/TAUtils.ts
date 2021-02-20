@@ -258,3 +258,37 @@ export function obv(close: Array<number>, volumes: Array<number>, period: number
     return total;
 }
 
+/**
+ * Calculates the Money Flow Index (money flow index) of an asset.
+ * 
+ * For more information :
+ * https://school.stockcharts.com/doku.php?id=technical_indicators:money_flow_index_mfi
+ * @param highs array of the daily highs from most recent to least recent.
+ * @param lows array of daily lows from most recent to least recent.
+ * @param close array of the daily closing price from most recent to least recent.
+ * @param volume array of daily volume from most recent to least recent.
+ * @param period the number of days to calculate mfi for
+ */
+export function mfi(highs: Array<number>, lows: Array<number>, close: Array<number>, volume: Array<number>, period: number): number {
+    let typicalPriceYesterday;
+    let positiveMoneyFlow: number = 0;
+    let negativeMoneyFlow: number = 0;
+    for (let i = 0; i < period; i++) {
+        let typicalPriceToday;
+        if (!typicalPriceYesterday) {
+            typicalPriceToday = (highs[i] + lows[i] + close[i]) / 3;
+        } else {
+            typicalPriceToday = typicalPriceYesterday;
+        }
+        typicalPriceYesterday = (highs[i + 1] + lows[i + 1] + close[i + 1]) / 3;
+        const moneyFlow = typicalPriceToday * volume[i];
+        if (typicalPriceToday > typicalPriceYesterday) {
+            positiveMoneyFlow += moneyFlow;
+        } else {
+            negativeMoneyFlow += moneyFlow;
+        }
+    }
+    const moneyFlowRatio = positiveMoneyFlow / negativeMoneyFlow;
+    return (100 - (100 / (1 + moneyFlowRatio)));
+}
+
