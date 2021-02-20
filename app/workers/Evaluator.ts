@@ -38,7 +38,8 @@ export class Evaluator {
         technicalAnalysis.ema26 = TAUtils.ema(closingHistory, 26)[0];
         technicalAnalysis.rsi14 = TAUtils.rsi(closingHistory, 14);
 
-        technicalAnalysis.obv = TAUtils.obv(closingHistory, volumeHistory, 50)
+        technicalAnalysis.obv = TAUtils.obv(closingHistory, volumeHistory, 50);
+        technicalAnalysis.mfi = TAUtils.mfi(highHistory, lowHistory, closingHistory, volumeHistory, 14);
 
         const macd = TAUtils.macd(closingHistory, 20);
         const macdSignal = TAUtils.macdSignal(macd);

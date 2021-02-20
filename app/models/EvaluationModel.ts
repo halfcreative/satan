@@ -39,6 +39,7 @@ export class TechnicalAnalysis {
     public averageRateOfChange: number;
     public ichimokuCloud: IchimokuCloud;
     public obv: number;
+    public mfi: number;
 
 }
 
