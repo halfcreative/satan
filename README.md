@@ -1,4 +1,4 @@
-# SATAN (Sam's Automatic Trading Assistant Network)
+# SATAN (Semi-Automatic Trading Assistant Network)
 
 Satan is a securities trading algorithm written in typescript.
 
