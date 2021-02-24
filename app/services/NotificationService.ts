@@ -20,7 +20,7 @@ export class NotificationService {
         }
         let message = `Placing the following order${trade.orderParams.length > 1 ? 's' : ''}:\n`;
         for (let order of trade.orderParams) {
-            message += `A ${order.type} ${order.side} order for ${order.size} of ${order.product_id} at ${price} totalling ${parseInt(order.size) * price}\n`;
+            message += `A ${order.type} ${order.side} order for ${order.size} of ${order.product_id} at ${price} totalling ${(parseFloat(order.size) * price)}\n`;
         }
         return this.snsClient.publishMessage(message).then(res => { return true }).catch(err => { console.error(err, err.stack); return false });
     }

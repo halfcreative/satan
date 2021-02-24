@@ -55,7 +55,7 @@ export class Evaluator {
     }
 
     private evalutatePortfolioState(currency: string, context: ContextModel) {
-        console.info("-- Evaluating Account Info --");
+        console.info("Evaluating Account Info");
         let portfolioValue: number = 0;
         for (const account of context.accounts) {
             if (account.currency == CONSTANTS.USD) {
@@ -77,6 +77,7 @@ export class Evaluator {
 
     /**
      * Calculates the size of an order to place.
+     * needs more documentation
      * 
      * @private
      * @param {number} accountValue
@@ -87,6 +88,7 @@ export class Evaluator {
      * @memberof Evaluator
      */
     private calculateOrderSize(currency: string, context: ContextModel, portfolioState: PortfolioState): string {
+        console.info(`Caluculating Order Size for ${currency}`);
         const riskAmount: number = CONSTANTS.RISK_PERCENT * portfolioState.totalValue;
         const expectableRise: number = TAUtils.averageROC(this.assetService.singleSetHistory(context.history, 4), 20, true);
         const maxOrderSize: number =
@@ -119,6 +121,7 @@ export class Evaluator {
                 }
             }
         }
+        console.info(`Result: ${orderSize}`);
         return orderSize;
     }
 
@@ -168,21 +171,28 @@ export class Evaluator {
      * @memberof Evaluator
      */
     private determineActions(currency: string, context: ContextModel, technicalAnalysis: TechnicalAnalysis, portfolioState: PortfolioState,): Trade | null {
+        console.info("Evaluating Technical Analysis Metrics");
         let trade: Trade = null;
         const macdActionSignal = this.evaluateMACD(technicalAnalysis);
+        // This is where we ultimately decide whther or not to buy or sell. Here is where strategies will be implemented.
         if (macdActionSignal == CONSTANTS.BUY) {
             // buy action
+            console.info("Buy signal recieved");
             trade = this.craftTrade(currency, context, portfolioState, technicalAnalysis, true);
         } else if (macdActionSignal == CONSTANTS.SELL) {
             // sell action
+            console.info("Sell signal recieved");
             trade = this.craftTrade(currency, context, portfolioState, technicalAnalysis, false);
         } else {
             // no action
         }
+        console.info(`Current Asset State:`);
+        console.info(technicalAnalysis);
         return trade;
     }
 
     private craftTrade(currency: string, context: ContextModel, portfolioState: PortfolioState, technicalAnalysis: TechnicalAnalysis, buy: boolean): Trade {
+        console.info(`Crafting Trade`);
         const trade = new Trade();
         trade.orderParams = [];
         if (buy) {
@@ -239,8 +249,7 @@ export class Evaluator {
                 trade.orderParams.push(sellOrder);
             }
         }
-
-
+        console.info(trade);
         return trade;
     }
 

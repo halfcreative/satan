@@ -45,6 +45,7 @@ export class FlowHandler {
      * runs the code sequence for automated analysis.
      */
     private autoFlow() {
+        console.info("Executing automated analysis");
         // Initiate the worker classes if not already present
         if (!this.aggregator) {
             this.aggregator = new Aggregator(this.assetService, this.dbService);
