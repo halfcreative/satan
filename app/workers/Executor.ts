@@ -18,8 +18,9 @@ export class Executor {
     public async executeOrderFromEvaluation(evaluation: Evaluation): Promise<Evaluation> {
         if (evaluation.trade) {
             console.info("Trade Request Confirmed");
-            console.log(`${evaluation.trade.orderParams.length} orders to place`);
-            console.log(evaluation.trade);
+            console.info(evaluation.trade);
+            console.info(`${evaluation.trade.orderParams.length} orders to place`);
+            console.info(evaluation.trade);
             return this.assetService.executeMultipleOrders(evaluation.trade.orderParams).then(async (result) => {
                 evaluation.trade.orderReciepts = result;
                 await this.notificationService.sendOrderNotification(evaluation.price, evaluation.trade);

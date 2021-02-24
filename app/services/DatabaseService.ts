@@ -26,7 +26,7 @@ export class DBService {
     }
 
     public storeTrade(trade: Trade) {
-        console.info(`Storing Evaluation`);
+        console.info(`Storing Trade info`);
         return this.dbClient.connectToDatabase().then((db: Db) => {
             return this.dbClient.storeTrade(db, trade).then(storedTrade => { return storedTrade });
         })

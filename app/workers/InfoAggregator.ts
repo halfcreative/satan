@@ -18,6 +18,7 @@ export class Aggregator {
      * @param asset The asset to be gathering information for
      */
     public gatherAssetInfo(asset: string): Promise<ContextModel> {
+        console.info(`Gathering info for ${asset}`);
         return Promise.all([
             this.assetService.getTicker(asset),
             this.assetService.getHistory(asset, 100),
