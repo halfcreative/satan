@@ -192,15 +192,15 @@ export class Evaluator {
     }
 
     private craftTrade(currency: string, context: ContextModel, portfolioState: PortfolioState, technicalAnalysis: TechnicalAnalysis, buy: boolean): Trade {
-        console.info(`Crafting Trade`);
+        console.info(`Crafting ${buy ? "buy" : "sell"} Trade`);
         const trade = new Trade();
         trade.orderParams = [];
         if (buy) {
             const orderSize = this.calculateOrderSize(CONSTANTS.USD, context, portfolioState);
             const orderSizeNumber = parseFloat(orderSize);
             if (
-                orderSizeNumber > CONSTANTS.BTC_MINIMUM &&
-                orderSizeNumber < CONSTANTS.BTC_MAXIMUM
+                orderSizeNumber > CONSTANTS.USD_MINIMUM &&
+                orderSizeNumber < CONSTANTS.USD_MAXIMUM
             ) {
                 const limitOrderSize = (
                     orderSizeNumber / parseFloat(context.ticker.price)
@@ -232,6 +232,8 @@ export class Evaluator {
                 trade.orderParams.push(marketOrder);
                 trade.orderParams.push(stopLossOrder);
                 trade.orderParams.push(priceTargetOrder);
+            } else {
+                console.log(`Ordersize (${orderSize}) is not between min (${CONSTANTS.USD_MINIMUM}) and max (${CONSTANTS.USD_MAXIMUM})`);
             }
         } else {
             const orderSize = this.calculateOrderSize(currency.split('-')[0], context, portfolioState);
@@ -247,6 +249,8 @@ export class Evaluator {
                 orderSizeNumber < CONSTANTS.BTC_MAXIMUM
             ) {
                 trade.orderParams.push(sellOrder);
+            } else {
+                console.log(`Ordersize (${orderSize}) is not between min (${CONSTANTS.BTC_MINIMUM}) and max (${CONSTANTS.BTC_MAXIMUM})`);
             }
         }
         console.info(trade);
