@@ -220,18 +220,8 @@ export class Evaluator {
                     product_id: currency,
                     stop: "loss"
                 } as LimitOrder;
-                const priceTargetOrder = {
-                    type: CONSTANTS.LIMIT_ORDER,
-                    side: CONSTANTS.SELL,
-                    price: this.calculatePriceTarget(context.ticker, technicalAnalysis),
-                    stop_price: this.calculatePriceTarget(context.ticker, technicalAnalysis),
-                    size: limitOrderSize,
-                    product_id: currency,
-                    stop: "entry"
-                } as LimitOrder;
                 trade.orderParams.push(marketOrder);
                 trade.orderParams.push(stopLossOrder);
-                trade.orderParams.push(priceTargetOrder);
             } else {
                 console.log(`Ordersize (${orderSize}) is not between min (${CONSTANTS.USD_MINIMUM}) and max (${CONSTANTS.USD_MAXIMUM})`);
             }

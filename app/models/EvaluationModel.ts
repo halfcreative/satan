@@ -108,7 +108,7 @@ export class PortfolioState {
 export class Trade {
     public orderParams: Array<OrderParams>;
     public orderReciepts: Array<OrderResult>;
-    public result: number = 0; // 0 for no result, 1 for win , 2 for loss
+    public result: number = 0; // 0 for no result, 1 for win , 2 for loss, 3 for neither
 
     public getOrderIds() {
         const ids: Array<string> = [];
