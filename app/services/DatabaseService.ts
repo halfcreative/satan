@@ -12,6 +12,7 @@ export class DBService {
 
     public storeEvaluation(evaluation: Evaluation): Promise<Evaluation> {
         console.info(`Storing Evaluation`);
+        console.info(evaluation);
         return this.dbClient.connectToDatabase().then((db: Db) => {
             return this.dbClient.storeEvaluation(db, evaluation).then(storedEval => { return storedEval });
         })

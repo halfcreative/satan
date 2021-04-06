@@ -1,5 +1,6 @@
 import { CoinbaseAPIClient } from "../clients/CoinbaseAPIClient";
 import { Account, OrderInfo, OrderParams, OrderResult } from "coinbase-pro";
+import { BUY } from "constants/constants";
 
 /**
  * Service for getting asset information.
@@ -56,6 +57,27 @@ export class AssetService {
             promises.push(this.executeOrder(order));
         }
         return Promise.all(promises);
+    }
+
+    public executeTrade(orders: Array<OrderParams>): Promise<Array<OrderResult>> {
+        const orderResults: Array<OrderResult> = [];
+        if (orders[0].side == BUY) {
+            // Buy contains a buy order and a stop loss. get the size for the stop loss from the result of the buy order
+            return this.executeOrder(orders[0]).then(result => {
+                orders[1].size = result.size;
+                orderResults.push(result);
+                return this.executeOrder(orders[1])
+            }).then(resultSellOrder => {
+                orderResults.push(resultSellOrder);
+                return orderResults;
+            });
+        } else {
+            // Right now, sell side only contains a single order
+            return this.executeOrder(orders[0]).then(result => {
+                orderResults.push(result);
+                return orderResults;
+            });
+        }
     }
 
     public getAccounts(): Promise<Array<Account>> {
